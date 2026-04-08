@@ -1,0 +1,78 @@
+﻿div#card_content_style {
+    width: 250px;
+}
+
+div#card_header_style {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+div#card_body_style {
+    height: 50px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    margin-top: 12px;
+    margin-bottom: 12px;
+    height: auto;
+}
+
+div#card_button_lane_style {
+    display: flex;
+    flex-direction: row-reverse;
+}
+
+button#ping_button_style {
+    width: 48px;
+    height: 48px;
+    cursor: crosshair;
+}
+
+div#card_footer_style {
+    padding: 5px;
+    background-color: var(--color-element);
+    min-height: 80px;
+}
+
+button.button_style {
+    border-radius: var(--radius-md);
+    border-style: solid;
+    border-width: 2px;
+    background-color: var(--color-secondary);
+    border-color: var(--color-border-alt);
+    color: var(--color-text-alt);
+    padding: 1px 4px;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+button.button_style:hover {
+    background-color: var(--color-secondary-hover);
+    border-color: var(--color-border-active);
+}
+
+button.button_style:active {
+    background-color: var(--color-secondary-hover);
+    border-color: var(--color-border-active);
+}
+
+.text_style {
+    font-weight: bold;
+    background: linear-gradient(to right, var(--color-text), var(--color-text-highlight), var(--color-text));
+    background-clip: text;
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    will-change: background-position;
+    animation: shine 1s linear infinite;
+}
+
+@keyframes shine {
+    to {
+        background-position: 200% center;
+    }
+}

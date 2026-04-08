@@ -1,0 +1,23 @@
+﻿@typeparam TDialog
+@typeparam TModel
+
+<div class="dialog_body">
+    <div class="dialog_content" style=@AdditionalContentStyle>
+        <div class="dialog_header">
+            <button @onclick="CancelAsync" class="button_style">
+                Close
+            </button>
+        </div>
+        <div class="inner_dialog">
+            <DynamicComponent Type="@typeof(TDialog)" @ref=_innerDialogRef></DynamicComponent>
+        </div>
+        @if (ShowConfirmButton)
+        {
+            <div class="dialog_footer">
+                <button @onclick="ConfirmAsync" class="button_style">
+                    Confirm
+                </button>
+            </div>
+        }
+    </div>
+</div>

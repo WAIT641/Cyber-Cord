@@ -1,0 +1,45 @@
+﻿@using Radzen.Blazor;
+
+<div id="form">
+    <h3 class="text_style">Settings</h3>
+
+    
+    <div id="top_panel_style">
+        <div id="top_side_panel_style">
+            <button class="button_style" @onclick=Model.LogOutAsync>Log out</button>
+            <button class="button_style" @onclick=Model.GetLatencyAsync>Latency</button>
+            <button class="button_style" @onclick=Model.DeleteAccount>Delete Account</button>
+            <button class="button_style" @onclick=Model.ChangePassword>Change Password</button>
+            <br />
+            <button class="button_style" @onclick=InvertSoundsEnabledAsync>
+                @if (EnableSounds)
+                {
+                    <p>Disable sounds</p>
+                }
+                else
+                {
+                    <p>Enable sounds</p>
+                }
+            </button>
+        </div>
+    </div>
+
+    <RadzenTemplateForm Data="Model.UserDetail">
+        <label for="display_name" class="label_style text_style">Display Name</label>
+        <br />
+        <RadzenTextBox id="display_name" Name="display_name" Placeholder="Enter Display Name" class="input_style" @bind-Value="Model.UserDetail.DisplayName" />
+        <br />
+
+        <label for="description" class="label_style text_style">Description</label>
+        <br />
+        <RadzenTextArea id="description" Name="descriptiion" Placeholder="Enter description" class="text_area" @bind-Value="Model.UserDetail.Description" />
+        <br />
+
+        <label class="label_style text_style">Email: @Model.UserDetail.Email</label>
+
+        <div id="color_line_style">
+            <label for="color" class="label_style text_style">Color</label>
+            <input id="color" class="color_style" type="color" @bind-value=ColorHex />
+        </div>
+    </RadzenTemplateForm>
+</div>

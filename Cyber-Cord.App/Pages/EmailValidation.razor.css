@@ -1,0 +1,100 @@
+﻿body {
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    background: var(--color-bg-dark);
+}
+
+div#validation_data {
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    min-width: 50px;
+    max-width: 400px;
+    width: 100%;
+    min-height: 50px;
+    border-width: 2px;
+    border-style: solid;
+    border-color: var(--color-border);
+    background-color: var(--color-bg);
+    padding: 30px;
+}
+
+.text_style {
+    font-weight: bold;
+    background: linear-gradient(to right, var(--color-text), var(--color-text-highlight), var(--color-text));
+    background-clip: text;
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    will-change: background-position;
+    animation: shine 1s linear infinite;
+}
+
+@keyframes shine {
+    to {
+        background-position: 200% center;
+    }
+}
+
+label.label_style {
+    margin-left: 10px;
+}
+
+input.input_style {
+    height: 20px;
+    border-color: var(--color-border);
+    border-style: solid;
+    border-width: 2px;
+    border-radius: 5px;
+    padding: 5px 10px;
+    background-color: var(--color-bg-alt);
+    color: var(--color-text-alt);
+    margin-bottom: 10px;
+    width: 350px;
+}
+
+input.input_style:hover {
+    border-color: var(--color-border-alt);
+}
+
+input.input_style:focus {
+    border-color: var(--color-border-active);
+    outline: none;
+}
+
+button#submit_button {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -ms-transform: translate(-50%, 370%);
+    transform: translate(-50%, 370%);
+    width: 200px;
+    height: 40px;
+}
+
+button#resend_button {
+    width: 100px;
+    height: 30px;
+}
+
+button.button_style {
+    border-radius: 5px;
+    border-style: solid;
+    border-width: 2px;
+    background-color: var(--color-secondary);
+    border-color: var(--color-border-alt);
+}
+
+button.button_style:hover {
+    background-color: var(--color-secondary-hover);
+    border-color: var(--color-border);
+}
+
+button.button_style:active {
+    background-color: var(--color-secondary-hover);
+    border-color: var(--color-border-active);
+}

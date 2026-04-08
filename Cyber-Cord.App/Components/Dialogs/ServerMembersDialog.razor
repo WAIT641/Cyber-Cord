@@ -1,0 +1,38 @@
+﻿<div id="server_members_dialog_style">
+    <h3 class="text_style">@Model.Name Members:</h3>
+
+    <div>
+        @foreach (var user in Model.Members)
+        {
+            <div class="user_entry_style">
+                <div class="user_info_style">
+                    <Avatar User=user ShowDialog="Model.ShowUserDialog" />
+                    <p class="text_style">@user.DisplayName</p>
+                </div>
+
+                <div class="user_actions_style">
+                    <button class="button_style" @onclick=@(async () => await BanUserAsync(user))>Ban</button>
+                    <button class="button_style" @onclick=@(async () => await KickUserAsync(user))>Kick</button>
+                </div>
+            </div>
+        }
+    </div>
+
+    <h3 class="text_style">@Model.Name Bans:</h3>
+
+    <div>
+        @foreach (var user in Model.Banned)
+        {
+            <div class="user_entry_style">
+                <div class="user_info_style">
+                    <Avatar User=user ShowDialog="Model.ShowUserDialog" />
+                    <p class="text_style">@user.DisplayName</p>
+                </div>
+
+                <div class="user_actions_style">
+                    <button class="button_style" @onclick=@(async () => await UnbanUserAsync(user))>Unban</button>
+                </div>
+            </div>
+        }
+    </div>
+</div>

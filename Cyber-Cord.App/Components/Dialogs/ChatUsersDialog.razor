@@ -1,0 +1,20 @@
+﻿<div id="server_members_dialog_style">
+    <h3 class="text_style">@Model.Name Users:</h3>
+
+    <div>
+        @foreach (var user in Model.Users)
+        {
+            <div class="user_entry_style">
+                <div class="user_info_style">
+                    <Avatar User=user ShowDialog="Model.ShowUserDialog" />
+                    <p class="text_style">@user.DisplayName</p>
+                </div>
+
+                <div class="user_actions_style">
+                    <button class="button_style" @onclick=@(async () => await KickUserAsync(user))>Kick</button>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+

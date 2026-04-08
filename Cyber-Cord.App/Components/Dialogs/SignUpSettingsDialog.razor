@@ -1,0 +1,18 @@
+﻿@using Radzen.Blazor
+
+<div id="form">
+    <h3 class="text_style">Settings</h3>
+
+    <RadzenTemplateForm Data="Model">
+        <label for="description" class="label_style text_style">Description</label>
+        <br />
+        <RadzenTextArea id="description" Name="descriptiion" Placeholder="Enter description" class="text_area" @bind-Value="Model.Description" />
+        <br />
+
+        <div id="color_line_style">
+            <label for="color" class="label_style text_style">Color</label>
+            <input id="color" class="color_style" type="color" @bind-value=ColorHex />
+        </div>
+    </RadzenTemplateForm>
+</div>
+

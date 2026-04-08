@@ -1,0 +1,449 @@
+﻿@page "/"
+@using Cyber_Cord.App.Components.Dialogs
+@using Cyber_Cord.App.Enums
+@using Cyber_Cord.App.Models
+@using Cyber_Cord.App.Services
+@using Radzen
+@inject BorrowService BorrowService
+
+<body>
+<div class="main-container">
+    <!-- Left Sidebar - Server/DM Icons -->
+    <div class="group-sidebar">
+        <button class="group-button dm-button @(_directMessages ? "active" : "")"
+                @onclick="ShowDirectMessagesAsync">
+            <span>DM</span>
+        </button>
+        <div class="group-divider"></div>
+        <div class="group-list">
+            <button class="server-button-add" @onclick="() => AddServer()"></button>
+            @if (_servers.Count > 0)
+            {
+                @foreach (var server in _servers)
+                {
+                    <ContextMenuTrigger MenuId="server-menu" Data=@server>
+                        <button class="group-button @(_selectedServerId == server.Id ? "active" : "")"
+                                @onclick="() => SelectServerAsync(server.Id)">
+                            <span>@server.Name[0]</span>
+                        </button>
+                    </ContextMenuTrigger>
+                }
+                <div style="margin-bottom: 100px; width: 1px;"></div>
+            }
+        </div>
+    </div>
+
+    <!-- Second Sidebar - Channels/Friends -->
+    <div class="channel-sidebar">
+        <div class="sidebar-header">
+            <h3>@SidebarTitle</h3>
+        </div>
+
+        @if (_directMessages)
+        {
+            <!-- Toggle between Friends and Messages -->
+            <div class="sidebar-toggle">
+                <button class="toggle-button @(_currentDmView == DmViewState.Friends ? "active" : "")"
+                        @onclick="() => _currentDmView = DmViewState.Friends">
+                    Friends
+                </button>
+                <button class="toggle-button @(_currentDmView == DmViewState.Chats ? "active" : "")"
+                        @onclick="() => _currentDmView = DmViewState.Chats">
+                    Messages
+                </button>
+                <button class="toggle-button @(_currentDmView == DmViewState.Requests ? "active" : "")"
+                        @onclick="() => _currentDmView = DmViewState.Requests">
+                    Requests
+                </button>
+            </div>
+        }
+
+        <div class="sidebar-content">
+            @if (_directMessages)
+            {
+                @if (_currentDmView == DmViewState.Friends)
+                {
+                    <!-- Friends List -->
+                    @if (_friends != null)
+                    {
+                        @foreach (var friend in _friends)
+                        {
+                            <button class="channel-button"
+                                    @onclick="() => SelectFriendAsync(friend.Id)">
+                                <span>@friend.OtherUser.DisplayName</span>
+                            </button>
+                        }
+                    }
+                }
+                else if (_currentDmView == DmViewState.Requests)
+                {
+                    <!-- Friend Requests Placeholder (only visible in sidebar) -->
+                    @if (_friendRequests != null)
+                    {
+                        @foreach (var request in _friendRequests)
+                        {
+                            <button class="channel-button">
+                                <span>
+                                    @if (request.ReceivingUser.Id == SessionState.UserId)
+                                    {
+                                        @request.RequestingUser.DisplayName
+                                    }
+                                    else
+                                    {
+                                        @request.ReceivingUser.DisplayName
+                                    }
+                                </span>
+                            </button>
+                        }
+                    }
+                }
+                else
+                {
+                    <!-- Chats -->
+                    <button class="channel-button" @onclick="AddChat">
+                        <span>Create chat +</span>
+                    </button>
+                    @foreach (var (index, chat) in _chats.Index())
+                    {
+                        <ContextMenuTrigger MenuId="chat-menu" Data="chat">
+                            <button class="channel-button @(_selectedChatIndex == index ? "active" : "")"
+                                    @onclick="() => SelectChatByIndexAsync(index)">
+                                <span>@chat.Name</span>
+                            </button>
+                        </ContextMenuTrigger>
+                    }
+                }
+            }
+            else
+            {
+                <!-- Channels List -->
+                @if (_currentUser.Id == _servers!.First(x => x.Id == _selectedServerId).OwnerId)
+                {
+                    <button class="channel-button" @onclick="AddChannel">
+                        <span>Create channel +</span>
+                    </button>
+                    <button class="channel-button" @onclick="AddServerMember">
+                        <span>Add user +</span>
+                    </button>
+                }
+                @foreach (var (index, channel) in _channels.Index())
+                {
+                    <ContextMenuTrigger MenuId="channel-menu" Data="channel">
+                        <button class="channel-button @(_selectedChannelIndex == index ? "active" : "")" @onclick="() => SelectChannelByIndexAsync(index)">
+                            <span># @channel.Name</span>
+                        </button>
+                    </ContextMenuTrigger>
+                }
+            }
+        </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="content-area">
+        <div class="content-header">
+            <h2>@ContentTitle</h2>
+            <button @onclick="StartCall">Call</button>
+        </div>
+
+        <div class="content-body">
+            @if (_directMessages && _currentDmView == DmViewState.Friends)
+            {
+                <!-- Friends View -->
+                <div class="friends-container">
+                    @if (!_isAddingFriend)
+                    {
+                        <!-- Friends List View -->
+                        <div class="friends-header">
+                            <h3>All Friends - @(_friends?.Count ?? 0)</h3>
+                            <button class="add-friend-button" @onclick="ToggleAddFriend" title="Add Friend"></button>
+                        </div>
+                        <div class="friends-list">
+                            @if (_friends != null)
+                            {
+                                @foreach (var friend in _friends)
+                                {
+                                    <div class="friend-card">
+                                        <Cyber_Cord.App.Components.Avatar User="friend.OtherUser" ShowDialog="ShowUserDialog" />
+                                        <div class="friend-info">
+                                            <div class="friend-name">@friend.OtherUser.DisplayName</div>
+                                            <div class="friend-username">@friend.OtherUser.Name</div>
+                                            <div class="friend-description">@friend.OtherUser.Description</div>
+                                        </div>
+                                        <button class="remove-friend-button" @onclick="() => RemoveFriendAsync(friend.Id)">Remove</button>
+                                        <button class="ping-friend-button" @onclick="() => PingAsync(friend.OtherUser.Id!.Value)">Ping</button>
+                                        <button class="message-friend-button" @onclick:stopPropagation="true" @onclick="() => SelectFriendAsync(friend.Id)">Message</button>
+                                        
+                                    </div>
+                                }
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <!-- Add Friend View -->
+                        <div class="add-friend-container">
+                            <div class="add-friend-header">
+                                <h3>Add Friend +</h3>
+                                <button class="back-button" @onclick="CancelAddFriend">✕</button>
+                            </div>
+                            <div class="add-friend-body">
+                                <p class="add-friend-instructions">
+                                    Enter your friend's username to send them a friend request.
+                                </p>
+                                <input 
+                                    type="text" 
+                                    class="add-friend-input" 
+                                    @bind="_newFriendUsername" 
+                                    placeholder="Enter username#1234"
+                                    @bind:event="oninput" />
+                                <div class="add-friend-actions">
+                                    <button class="send-request-button @(!string.IsNullOrWhiteSpace(_newFriendUsername) ? "enabled" : "")" 
+                                            @onclick="SendFriendRequestAsync" 
+                                            disabled="@string.IsNullOrWhiteSpace(_newFriendUsername)">
+                                        Send Friend Request
+                                    </button>
+                                    <button class="cancel-button" @onclick="CancelAddFriend">Cancel</button>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else if (_directMessages && _currentDmView == DmViewState.Requests)
+            {
+                <!-- Friend Requests View -->
+                <div class="friends-container">
+                    <div class="friends-header">
+                        <h3>Friend Requests - @_friendRequests!.Count</h3>
+                    </div>
+                    <div class="requests-list">
+                        @foreach (var request in _friendRequests.Where(x => x.ReceivingUser.Id == SessionState.UserId))
+                        {
+                            <div class="request-card">
+                                <Cyber_Cord.App.Components.Avatar User="request.RequestingUser" ShowDialog="ShowUserDialog" />
+                                <div class="request-info">
+                                    <div class="request-name">@request.RequestingUser.DisplayName</div>
+                                    <div class="request-username">@request.RequestingUser.Name</div>
+                                    <div class="request-message">Wants to connect</div>
+                                </div>
+                                <div class="request-actions">
+                                    <button class="accept-button" @onclick="() => AcceptRequestAsync(request.Id)">Accept</button>
+                                    <button class="reject-button" @onclick="() => RejectRequestAsync(request.Id)">Reject</button>
+                                </div>
+                            </div>
+                        }
+                        @foreach (var pending in _friendRequests.Where(x => x.RequestingUser.Id == SessionState.UserId))
+                        {
+                            <div class="request-card">
+                                <Cyber_Cord.App.Components.Avatar User="pending.ReceivingUser" ShowDialog="ShowUserDialog" />
+                                <div class="request-info">
+                                    <div class="request-name">@pending.ReceivingUser.DisplayName</div>
+                                    <div class="request-username">@pending.ReceivingUser.Name</div>
+                                    <div class="request-message">Pending...</div>
+                                </div>
+                                <div class="request-actions">
+                                    <button class="reject-button" @onclick="() => RejectRequestAsync(pending.Id)">Revoke</button>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+            else if (_selectedChannelIndex is not null || _selectedChatIndex is not null)
+            {
+                <!-- Chat View -->
+                <div class="chat-container">
+                    <!-- Messages Area -->
+                    <Cyber_Cord.App.Components.AutoMessagePager
+                        MessageSource=@(GetCurrentMessageSource())
+                        Users="_loadedUsers"
+                        ShowUserDialog="ShowUserDialog"
+                        MessageTooltip="message-menu"
+                        @ref=@_messagePager
+                        />
+
+                    <!-- Input Area -->
+                    <div class="input-area">
+                        <input type="text" class="message-input" @bind="_newMessage" @bind:event="oninput" @onkeyup="HandleKeyPressAsync" placeholder="Message"
+                               disabled="@((_selectedChatIndex is null && _currentDmView == DmViewState.Chats) || (_selectedChannelIndex is null && _currentDmView == DmViewState.Channels))"/>
+                        <button class="send-button" @onclick="SendMessageAsync" disabled="@string.IsNullOrWhiteSpace(_newMessage)">Send</button>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@if (_currentUser is not null)
+{
+    <div id="current-user-card">
+        <div id="current-user-card-user-specific">
+            <div id="current-user-avatar">
+                <Cyber_Cord.App.Components.Avatar User="_currentUser" ShowDialog="ShowUserDialog" />
+            </div>
+            <p id="current-user-name">@_currentUser.DisplayName</p>
+        </div>
+        <div id="current-user-card-user-nonspecific">
+            <button @onclick=LoadGeneralAsync><img src="res/refresh-white.svg" /></button>
+            <button @onclick=OnOpenSettingsAsync><img src="res/cog-white.svg" /></button>
+        </div>
+    </div>
+}
+
+@if (_lastPing is not null)
+{
+    <div class="ping-bubble fade-target" id="ping-bubble-id">
+        @_lastPing
+    </div>
+}
+</body>
+
+<ContextMenu Id="server-menu">
+    @{
+        var server = (ServerModel)context.Data;
+
+        <Item OnClick=@(async (_) => await OnServerViewPeopleAsync(server))>View Members</Item>
+        <Item OnClick=@(_ => OnServerViewInfo(server))>View Server Info</Item>
+        <Item OnClick=@(async (_) => await SelectServerAsync(server.Id))>Select</Item>
+
+        if (server.OwnerId == _currentUser!.Id)
+        {
+            <Item OnClick=@(_ => OnModifyServer(server))>Modify</Item>
+            <Item OnClick=@(async (_) => await OnDeleteServerAsync(server))>Delete</Item>
+        }
+    }
+</ContextMenu>
+
+<ContextMenu Id="chat-menu">
+    @{
+        var chat = (ChatModel)context.Data;
+        var index = _chats.FindIndex(x => x.Id == chat.Id);
+
+        <Item OnClick=@(async (_) => await OnChatViewPeopleAsync(chat))>View Users</Item>
+        <Item OnClick=@(_ => OnChatAddUser(chat))>Add User</Item>
+        <Item OnClick=@(async (_) => await SelectChatByIndexAsync(index))>Select</Item>
+        <Item OnClick=@(_ => OnModifyChat(chat))>Modify</Item>
+        <Item OnClick=@(async (_) => await OnDeleteChatAsync(chat))>Delete</Item>
+    }
+</ContextMenu>
+
+<ContextMenu Id="channel-menu">
+    @{
+        var channel = (ChannelModel)context.Data;
+        var index = _channels.FindIndex(x => x.Id == channel.Id);
+
+        <Item OnClick=@(async (_) => OnChannelViewInfo(channel))>View Channel Information</Item>
+        <Item OnClick=@(async (_) => await SelectChannelByIndexAsync(index))>Select</Item>
+
+        @if (_selectedServerId is not null && _servers!.First(x => x.Id == _selectedServerId!.Value).OwnerId == _currentUser!.Id)
+        {
+            <Item OnClick=@(_ => OnModifyChannel(channel))>Modify</Item>
+            <Item OnClick=@(async (_) => await OnDeleteChannelAsync(channel))>Delete</Item>
+        }
+    }
+</ContextMenu>
+
+<ContextMenu Id="message-menu">
+    @{
+        var message = (MessageModel)context.Data;
+
+        if (message is null)
+        {
+            return;
+        }
+
+        Func<MessageModel, Task> removeCallbackAsync = _selectedChatIndex is null
+            ? RemoveChannelMessageAsync
+            : RemoveChatMessageAsync;
+
+        <Item OnClick=@(_ => OnMessageUpdate(message))>Edit</Item>
+        <Item OnClick=@(async (_) => await removeCallbackAsync(message))>Remove</Item>
+        <Item OnClick=@(async (_) => await CopyMessageToClipboardAsync(message))>Copy</Item>
+    }
+</ContextMenu>
+
+@if (BorrowService.GetBorrowState<ChannelCreateDialog, ChannelCreateModel>().ShowingConfigureDialog)
+{
+    <Dialog TModel="@ChannelCreateModel" TDialog="@ChannelCreateDialog" OnConfirm="AddChannelCallbackAsync" OnCancel="StateHasChanged"></Dialog>
+}
+
+@if (BorrowService.GetBorrowState<ServerCreateDialog, ServerCreateModel>().ShowingConfigureDialog)
+{
+    <Dialog TModel="@ServerCreateModel" TDialog="@ServerCreateDialog" OnConfirm="AddServerCallbackAsync" OnCancel="StateHasChanged"></Dialog>
+}
+
+@if (BorrowService.GetBorrowState<AddServerMemberDialog, MemberFindModel>().ShowingConfigureDialog)
+{
+    <Dialog TModel="@MemberFindModel" TDialog="@AddServerMemberDialog" OnConfirm="AddServerMemberCallbackAsync" OnCancel="StateHasChanged"></Dialog>
+}
+
+@if (BorrowService.GetBorrowState<ChatAddUserDialog, ChatAddUserModel>().ShowingConfigureDialog)
+{
+    <Dialog TModel="@ChatAddUserModel" TDialog="@ChatAddUserDialog" OnConfirm="AddChatUserCallbackAsync" OnCancel="StateHasChanged"></Dialog>
+}
+
+@if (BorrowService.GetBorrowState<ChatCreateDialog, ChatCreateModel>().ShowingConfigureDialog)
+{
+    <Dialog TModel="@ChatCreateModel" TDialog="@ChatCreateDialog" OnConfirm="AddChatCallback" OnCancel="StateHasChanged"></Dialog>
+}
+
+@if (BorrowService.GetBorrowState<MessageEditDialog, MessageUpdateModel>().ShowingConfigureDialog)
+{
+    <Dialog TModel="@MessageUpdateModel" TDialog="@MessageEditDialog" OnConfirm="OnMessageUpdateCallbackAsync" OnCancel="StateHasChanged"></Dialog>
+}
+
+@if (BorrowService.GetBorrowState<ServerInfoDialog, ServerModel>().ShowingConfigureDialog)
+{
+    <Dialog TModel="@ServerModel" TDialog="@ServerInfoDialog" OnConfirm="StateHasChanged" OnCancel="StateHasChanged" ShowConfirmButton=false></Dialog>
+}
+
+@if (BorrowService.GetBorrowState<ChannelInfoDialog, ChannelModel>().ShowingConfigureDialog)
+{
+    <Dialog TModel="@ChannelModel" TDialog="@ChannelInfoDialog" OnConfirm="StateHasChanged" OnCancel="StateHasChanged" ShowConfirmButton=false></Dialog>
+}
+
+@if (BorrowService.GetBorrowState<ServerMembersDialog, ServerMembersModel>().ShowingConfigureDialog)
+{
+    <Dialog TModel="@ServerMembersModel" TDialog="@ServerMembersDialog" OnConfirm="StateHasChanged" OnCancel="StateHasChanged" ShowConfirmButton=false FullHeight=true></Dialog>
+}
+
+@if (BorrowService.GetBorrowState<ChatUsersDialog, ChatUsersModel>().ShowingConfigureDialog)
+{
+    <Dialog TModel="@ChatUsersModel" TDialog="@ChatUsersDialog" OnConfirm="StateHasChanged" OnCancel="StateHasChanged" ShowConfirmButton=false FullHeight=true></Dialog>
+}
+
+@if (BorrowService.GetBorrowState<UserSettingsDialog, UserSettingsDialogModel>().ShowingConfigureDialog)
+{
+    <Dialog TModel="@UserSettingsDialogModel" TDialog="@UserSettingsDialog" OnConfirm="OnOpenSettingsCallbackAsync" OnCancel="StateHasChanged"></Dialog>
+}
+
+@if (BorrowService.GetBorrowState<ChatUpdateDialog, ChatUpdateModel>().ShowingConfigureDialog)
+{
+    <Dialog TModel="@ChatUpdateModel" TDialog="@ChatUpdateDialog" OnConfirm="OnModifyChatCallbackAsync" OnCancel="StateHasChanged"></Dialog>
+}
+
+@if (BorrowService.GetBorrowState<ServerUpdateDialog, ServerUpdateModel>().ShowingConfigureDialog)
+{
+    <Dialog TModel="@ServerUpdateModel" TDialog="@ServerUpdateDialog" OnConfirm="OnModifyServerCallbackAsync" OnCancel="StateHasChanged"></Dialog>
+}
+
+@if (BorrowService.GetBorrowState<ChannelUpdateDialog, ChannelUpdateModel>().ShowingConfigureDialog)
+{
+    <Dialog TModel="@ChannelUpdateModel" TDialog="@ChannelUpdateDialog" OnConfirm="OnModifyChannelCallbackAsync" OnCancel="StateHasChanged"></Dialog>
+}
+
+@if (BorrowService.GetBorrowState<PasswordConfirmationDialog, string>().ShowingConfigureDialog)
+{
+    <Dialog TModel="@string" TDialog="@PasswordConfirmationDialog" OnConfirm="PasswordConfirmationCallbackAsync" OnCancel="StateHasChanged"></Dialog>
+}
+
+@if (BorrowService.GetBorrowState<ChangePasswordDialog, UserPasswordChangeModel>().ShowingConfigureDialog)
+{
+    <Dialog TModel="@UserPasswordChangeModel" TDialog="@ChangePasswordDialog" OnConfirm="ChangePasswordCallbackAsync" OnCancel="StateHasChanged"></Dialog>
+}
+
+<!-- Should be last -->
+@if (BorrowService.GetBorrowState<UserDisplayCard, UserDisplayCardModel>().ShowingConfigureDialog)
+{
+    <Dialog TModel="@UserDisplayCardModel" TDialog="@UserDisplayCard" OnConfirm="StateHasChanged" OnCancel="StateHasChanged" ShowConfirmButton=false></Dialog>
+}

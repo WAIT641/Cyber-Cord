@@ -1,0 +1,52 @@
+﻿<div id="pager_content" @onscroll="@ScrollAsync">
+    @if (_messages.Any())
+    {
+        @foreach (var message in _messages)
+        {
+            <div class="message-item">
+                <Cyber_Cord.App.Components.Avatar User="Users.FirstOrDefault(x => x.Id == message.UserId)" ShowDialog="ShowUserDialog" />
+                @if (MessageTooltip != string.Empty)
+                {
+                    <div class="context_menu_trigger_container_style">
+                        <ContextMenuTrigger MenuId="@MessageTooltip" Data="@message">
+                            <div class="message-content">
+                                <div class="message-header">
+                                    <span class="message-username">@GetUserDisplayName(message.UserId)</span>
+                                    <span class="message-timestamp">@message.CreatedAt.ToString("g")</span>
+                                </div>
+                                <div class="message-text">@message.Content</div>
+                            </div>
+                        </ContextMenuTrigger>
+                    </div>
+                }
+                else
+                {
+                    <div class="message-content">
+                        <div class="message-header">
+                            <span class="message-username">@GetUserDisplayName(message.UserId)</span>
+                            <span class="message-timestamp">@message.CreatedAt.ToString("g")</span>
+                        </div>
+                        <div class="message-text">@message.Content</div>
+                    </div>
+                }
+            </div>
+        }
+        @if (_loadingContent)
+        {
+            <div style="height: 5px;">
+                <!-- Call me crazy if you want -->
+            </div>
+            <div class="loader">
+                <div class="loaderBar"></div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="empty-state">
+            <p>No messages yet. Start the conversation!</p>
+        </div>
+    }
+</div>
+
+<script src="scripts/common.js"></script>

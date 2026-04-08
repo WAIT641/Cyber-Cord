@@ -1,0 +1,33 @@
+﻿@using Radzen.Blazor
+@using Services
+@inject SpinnerService SpinnerService
+@inject ErrorProviderService ErrorProviderService
+@inherits LayoutComponentBase
+
+<CascadingValue Value=UpdateState>
+    @Body
+</CascadingValue>
+
+@if (SpinnerService.IsBusy)
+{
+    <div class="popup_container_style">
+        <div id="spinner_style"></div>
+    </div>
+}
+
+@if (ErrorProviderService.IsErrorEnabled)
+{
+    <div class="popup_container_style">
+        <div id="error_style">
+            <div class="error_header_style">
+                <button @onclick="HideErrorAsync" class="button_style">
+                    Close
+                </button>
+            </div>
+            <p class="text_style">Error:</p>
+            <p class="text_style">@ErrorProviderService.Message</p>
+        </div>
+    </div>
+}
+
+<RadzenComponents @rendermode="RenderMode.InteractiveAuto" />

@@ -1,0 +1,218 @@
+﻿body {
+    margin: 0;
+    padding: 0;
+    width: 100vw;
+    height: 100vh;
+    background: var(--color-bg-dark);
+}
+
+label#title_style {
+    margin-top: 0;
+    padding-top: 20px;
+}
+
+div#signup_data {
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    min-width: 50px;
+    max-width: 600px;
+    width: 100%;
+    min-height: 50px;
+    border-width: 2px;
+    border-style: solid;
+    border-color: var(--color-border);
+    background-color: var(--color-bg);
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    overflow: hidden;
+    border-radius: var(--radius-xl);
+    box-sizing: border-box;
+}
+
+button#signup_button {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -ms-transform: translate(-50%, 500%);
+    transform: translate(-50%, 500%);
+    width: 200px;
+    height: 40px;
+}
+
+button#back_button {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -ms-transform: translate(-50%, 500%);
+    transform: translate(-50%, 500%);
+    width: 200px;
+    height: 40px;
+}
+
+button.button_style {
+    border-radius: var(--radius-md);
+    border-style: solid;
+    border-width: 2px;
+    background-color: var(--color-secondary);
+    border-color: var(--color-border-alt);
+    cursor: pointer;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+button.button_style:hover {
+    background-color: var(--color-secondary-hover);
+    border-color: var(--color-border);
+}
+
+button.button_style:active {
+    background-color: var(--color-secondary-hover);
+    border-color: var(--color-border-active);
+}
+
+div.pane_style {
+    width: 100%;
+}
+
+div#left_pane_style {
+    margin: 30px;
+}
+
+div#right_pane_style {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+}
+
+.text_style {
+    font-weight: bold;
+    background: linear-gradient(to right, var(--color-text), var(--color-text-highlight), var(--color-text));
+    background-clip: text;
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    will-change: background-position;
+    animation: shine 1s linear infinite;
+}
+
+label.label_style {
+    margin-left: 10px;
+}
+
+@keyframes shine {
+    to {
+        background-position: 200% center;
+    }
+}
+
+hr.bar_style {
+    border: solid var(--color-border);
+    background-color: transparent;
+    color: transparent;
+    margin: 0;
+}
+
+hr.vertical_bar {
+    border-width: 0 0 0 2px;
+    height: auto;
+    width: 0;
+}
+
+hr.horizontal_bar {
+    border-width: 2px 0 0 0;
+    height: 0;
+    width: auto;
+}
+
+div.right_partial_pane_style {
+    height: 50%;
+}
+
+div#right_top_partial_pane_style {
+    background-color: limegreen;
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: center;
+    border-radius: 0 var(--radius-xl) 0 0;
+}
+
+button#color_picker_style {
+    width: 20px;
+    height: 20px;
+    margin-left: 40%;
+    margin-bottom: 15%;
+    border-radius: var(--radius-full);
+    background-color: var(--color-element);
+    border-style: dotted;
+    border-color: var(--color-element-border);
+    cursor: pointer;
+    transition: border-width 0.1s ease;
+}
+
+button#color_picker_style:hover {
+    border-width: 3px;
+}
+
+div#right_bottom_partial_pane_style {
+    align-content: center;
+    padding-left: 15px;
+    border-radius: 0 0 var(--radius-xl) 0;
+}
+
+div#circle_style {
+    height: 100px;
+    width: 100px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -ms-transform: translate(110%, -50%);
+    transform: translate(110%, -50%);
+    border-radius: var(--radius-full);
+    border: 2px solid var(--color-border);
+    background-color: limegreen;
+    text-align: center;
+    align-content: center;
+    font-weight: bolder;
+    font-size: 50px;
+    box-shadow: 0 2px 20px hsl(0 0% 0% / 35%);
+}
+
+div#circle_style:hover {
+    border-color: transparent;
+    animation: border-angle-rotate 1.5s infinite linear;
+    background: linear-gradient(limegreen, limegreen) padding-box,
+    conic-gradient(from var(--border-angle), var(--color-border) 50%, var(--color-border-alt)) border-box;
+}
+
+@keyframes border-angle-rotate {
+    from { --border-angle: 0deg; }
+    to   { --border-angle: 360deg; }
+}
+
+@property --border-angle {
+    syntax: "<angle>";
+    initial-value: 0deg;
+    inherits: false;
+}
+
+.popup {
+    top: 50%;
+    left: 50%;
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    border-radius: var(--radius-xl);
+}
+
+#settings-popup {
+    border: var(--color-border);
+    background-color: var(--color-bg);
+    box-shadow: 5px;
+    height: 360px;
+    width: 600px;
+    border-radius: var(--radius-xl);
+}

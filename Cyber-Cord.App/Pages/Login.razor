@@ -1,0 +1,44 @@
+﻿@page "/login"
+
+@using Radzen
+@using Radzen.Blazor
+@using Models
+
+<body>
+    <RadzenTemplateForm TItem="UserLoginModel" Data=@_model Submit="SubmitAsync">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div id="login_data">
+            <label for="username" class="label_style text_style">Account Name</label>
+            <br>
+            <RadzenTextBox Name="username" id="username" Placeholder="Account Name"
+                   class="input_style" @bind-Value=_model.Name />
+            <RadzenRequiredValidator Component="username" Text="Account name is required" class="no_popup_validation" />
+            <br>
+
+            <label for="password" class="label_style text_style">Password</label>
+            <br>
+            <RadzenTextBox type="password" id="password" Name="password" Placeholder="Password"
+                   class="input_style" @bind-Value=_model.Password />
+            <RadzenRequiredValidator Component="password" Text="Password is required" class="no_popup_validation" />
+            <br>
+
+            <p class="text_style">
+                Don't have an account?
+                Create one now!
+            </p>
+            <div id="buttons">
+                <button id="create_account_button" class="button_style" type="button" @onclick=RedirectToSignUp>
+                    Create Account
+                </button>
+                <button id="create_account_button" class="button_style" type="button" @onclick=RedirectToGoogleLogin>
+                    Sign in with Google
+                </button>
+            </div>
+
+        </div>
+        <button id="login_button" class="button_style" type="submit">
+            Login
+        </button>
+    </RadzenTemplateForm>
+</body>

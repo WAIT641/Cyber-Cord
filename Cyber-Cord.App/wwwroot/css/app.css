@@ -1,0 +1,274 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&display=swap');
+
+.valid.modified:not([type=checkbox]) {
+    outline: 1px solid #26b050;
+}
+
+.invalid {
+    outline: 1px solid red;
+}
+
+.validation-message {
+    color: red;
+} 
+
+#blazor-error-ui {
+    color-scheme: light only;
+    background: lightyellow;
+    bottom: 0;
+    box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.2);
+    box-sizing: border-box;
+    display: none;
+    left: 0;
+    padding: 0.6rem 1.25rem 0.7rem 1.25rem;
+    position: fixed;
+    width: 100%;
+    z-index: 1000;
+}
+
+    #blazor-error-ui .dismiss {
+        cursor: pointer;
+        position: absolute;
+        right: 0.75rem;
+        top: 0.5rem;
+    }
+
+.blazor-error-boundary {
+    background: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTYiIGhlaWdodD0iNDkiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIG92ZXJmbG93PSJoaWRkZW4iPjxkZWZzPjxjbGlwUGF0aCBpZD0iY2xpcDAiPjxyZWN0IHg9IjIzNSIgeT0iNTEiIHdpZHRoPSI1NiIgaGVpZ2h0PSI0OSIvPjwvY2xpcFBhdGg+PC9kZWZzPjxnIGNsaXAtcGF0aD0idXJsKCNjbGlwMCkiIHRyYW5zZm9ybT0idHJhbnNsYXRlKC0yMzUgLTUxKSI+PHBhdGggZD0iTTI2My41MDYgNTFDMjY0LjcxNyA1MSAyNjUuODEzIDUxLjQ4MzcgMjY2LjYwNiA1Mi4yNjU4TDI2Ny4wNTIgNTIuNzk4NyAyNjcuNTM5IDUzLjYyODMgMjkwLjE4NSA5Mi4xODMxIDI5MC41NDUgOTIuNzk1IDI5MC42NTYgOTIuOTk2QzI5MC44NzcgOTMuNTEzIDI5MSA5NC4wODE1IDI5MSA5NC42NzgyIDI5MSA5Ny4wNjUxIDI4OS4wMzggOTkgMjg2LjYxNyA5OUwyNDAuMzgzIDk5QzIzNy45NjMgOTkgMjM2IDk3LjA2NTEgMjM2IDk0LjY3ODIgMjM2IDk0LjM3OTkgMjM2LjAzMSA5NC4wODg2IDIzNi4wODkgOTMuODA3MkwyMzYuMzM4IDkzLjAxNjIgMjM2Ljg1OCA5Mi4xMzE0IDI1OS40NzMgNTMuNjI5NCAyNTkuOTYxIDUyLjc5ODUgMjYwLjQwNyA1Mi4yNjU4QzI2MS4yIDUxLjQ4MzcgMjYyLjI5NiA1MSAyNjMuNTA2IDUxWk0yNjMuNTg2IDY2LjAxODNDMjYwLjczNyA2Ni4wMTgzIDI1OS4zMTMgNjcuMTI0NSAyNTkuMzEzIDY5LjMzNyAyNTkuMzEzIDY5LjYxMDIgMjU5LjMzMiA2OS44NjA4IDI1OS4zNzEgNzAuMDg4N0wyNjEuNzk1IDg0LjAxNjEgMjY1LjM4IDg0LjAxNjEgMjY3LjgyMSA2OS43NDc1QzI2Ny44NiA2OS43MzA5IDI2Ny44NzkgNjkuNTg3NyAyNjcuODc5IDY5LjMxNzkgMjY3Ljg3OSA2Ny4xMTgyIDI2Ni40NDggNjYuMDE4MyAyNjMuNTg2IDY2LjAxODNaTTI2My41NzYgODYuMDU0N0MyNjEuMDQ5IDg2LjA1NDcgMjU5Ljc4NiA4Ny4zMDA1IDI1OS43ODYgODkuNzkyMSAyNTkuNzg2IDkyLjI4MzcgMjYxLjA0OSA5My41Mjk1IDI2My41NzYgOTMuNTI5NSAyNjYuMTE2IDkzLjUyOTUgMjY3LjM4NyA5Mi4yODM3IDI2Ny4zODcgODkuNzkyMSAyNjcuMzg3IDg3LjMwMDUgMjY2LjExNiA4Ni4wNTQ3IDI2My41NzYgODYuMDU0N1oiIGZpbGw9IiNGRkU1MDAiIGZpbGwtcnVsZT0iZXZlbm9kZCIvPjwvZz48L3N2Zz4=) no-repeat 1rem/1.8rem, #b32121;
+    padding: 1rem 1rem 1rem 3.7rem;
+    color: white;
+}
+
+    .blazor-error-boundary::after {
+        content: "An error has occurred."
+    }
+
+.loading-progress {
+    position: relative;
+    display: block;
+    width: 8rem;
+    height: 8rem;
+    margin: 20vh auto 1rem auto;
+}
+
+    .loading-progress circle {
+        fill: none;
+        stroke: #e0e0e0;
+        stroke-width: 0.6rem;
+        transform-origin: 50% 50%;
+        transform: rotate(-90deg);
+    }
+
+        .loading-progress circle:last-child {
+            stroke: #1b6ec2;
+            stroke-dasharray: calc(3.141 * var(--blazor-load-percentage, 0%) * 0.8), 500%;
+            transition: stroke-dasharray 0.05s ease-in-out;
+        }
+
+.loading-progress-text {
+    position: absolute;
+    text-align: center;
+    font-weight: bold;
+    inset: calc(20vh + 3.25rem) 0 auto 0.2rem;
+}
+
+    .loading-progress-text:after {
+        content: var(--blazor-load-percentage-text, "Loading");
+    }
+
+code {
+    color: #c02d76;
+}
+
+.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
+    color: var(--bs-secondary-color);
+    text-align: end;
+}
+
+.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
+    text-align: start;
+}
+
+html, body {
+    font-family: Arial, serif;
+}
+
+body, html {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+@font-face {
+    font-family: "ChakraPetch";
+    src: url("/Fonts/ChakraPetch-Regular.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+}
+
+/* Global Scrollbar Styling */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: #4a4a4a #2b2b2b;
+}
+
+/* Webkit browsers (Chrome, Safari, Edge) */
+*::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+*::-webkit-scrollbar-track {
+    background: #2b2b2b;
+}
+
+*::-webkit-scrollbar-thumb {
+    background: #4a4a4a;
+    border-radius: 4px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+    background: #5a5a5a;
+}
+
+:root {
+    /* Unified Gray Color Scheme */
+
+    /* Text colors - using gray scale */
+    --color-text: var(--text-primary);
+    --color-text-highlight: var(--text-secondary);
+    --color-text-muted: var(--text-muted);
+    --color-text-alt: var(--text-secondary);
+    --color-text-alt-highlight: var(--text-primary);
+    --color-text-alt-muted: var(--text-faint);
+
+    /* Element colors - neutral grays */
+    --color-element: var(--bg-base);
+    --color-element-border: var(--border-base);
+
+    /* Background colors - unified gray palette */
+    --color-bg: var(--bg-darker);
+    --color-bg-alt: var(--bg-mid);
+    --color-bg-dark: var(--bg-darkest);
+
+    /* Border colors - subtle grays */
+    --color-border: var(--border-dark);
+    --color-border-alt: var(--border-mid);
+    --color-border-active: var(--accent);
+
+    /* Primary action - using accent blue */
+    --color-primary: var(--accent);
+    --color-primary-hover: var(--accent-hover);
+
+    /* Secondary action - muted gray */
+    --color-secondary: var(--bg-lighter);
+    --color-secondary-hover: var(--bg-light);
+
+    /* Accent - unified to accent blue */
+    --color-accent: var(--accent);
+
+    /* Status colors - kept functional but could be muted if desired */
+    --color-warning: var(--color-warning);
+    --color-error: var(--color-danger);
+
+    /* Backgrounds */
+    --bg-darkest:       #1a1a1a;
+    --bg-darker:        #1e1e1e;
+    --bg-dark:          #252525;
+    --bg-mid:           #2b2b2b;
+    --bg-base:          #353535;
+    --bg-light:         #3a3a3a;
+    --bg-lighter:       #404040;
+    --bg-input:         #404040;
+    --bg-request-hover: #323232;
+
+    /* Borders */
+    --border-dark:      #0e0e0e;
+    --border-mid:       #2a2a2a;
+    --border-base:      #3a3a3a;
+    --border-light:     #4a4a4a;
+
+    /* Text */
+    --text-primary:     #ffffff;
+    --text-secondary:   #dcddde;
+    --text-muted:       #b0b0b0;
+    --text-faint:       #888888;
+
+    /* Accent / brand - kept as blue for usability */
+    --accent:           #5865f2;
+    --accent-hover:     #4752c4;
+    --accent-active:    #3c45a5;
+    --accent-dm:        #3c45a5;
+
+    /* Status colors */
+    --color-success:       #2ecc71;
+    --color-success-hover: #2d7d46;
+    --color-danger:        #ed4245;
+    --color-danger-hover:  #c03537;
+    --color-remove:        #ff0000;
+    --color-remove-hover:  #810a0a;
+    --color-ping:          #441678;
+    --color-ping-hover:    #8041c5;
+    --color-avatar-friend: #5865f2;
+    --color-avatar-request:#ffa500;
+    --color-avatar-message:#26b050;
+
+    /* Border radius scale */
+    --radius-sm:   4px;
+    --radius-md:   6px;
+    --radius-lg:   8px;
+    --radius-xl:   12px;
+    --radius-pill: 50px;
+    --radius-full: 50%;
+}
+
+input.input_style {
+    height: 20px;
+    border-color: var(--color-border);
+    border-style: solid;
+    border-width: 2px;
+    border-radius: 5px;
+    padding: 5px 10px;
+    background-color: var(--color-bg-alt);
+    color: var(--color-text-alt);
+    margin-bottom: 10px;
+    width: 250px;
+}
+
+input.input_style:hover {
+    border-color: var(--color-border-alt);
+}
+
+input.input_style:focus {
+    border-color: var(--color-border-active);
+    outline: none;
+}
+
+textarea.text_area {
+    height: 20px;
+    border-color: var(--color-border);
+    border-style: solid;
+    border-width: 2px;
+    border-radius: 5px;
+    padding: 5px 10px;
+    background-color: var(--color-bg-alt);
+    color: var(--color-text-alt);
+    margin-bottom: 10px;
+    width: 90%;
+    resize: vertical;
+    min-height: 50px;
+}
+
+textarea.text_area:hover {
+    border-color: var(--color-border-alt);
+}
+
+textarea.text_area:focus {
+    border-color: var(--color-border-active);
+    outline: none;
+}
+
+.no_popup_validation {
+    position: absolute;
+    color: transparent;
+}

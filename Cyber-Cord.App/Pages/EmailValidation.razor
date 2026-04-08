@@ -1,0 +1,43 @@
+﻿@page "/validation/{userId:int}"
+
+@using Cyber_Cord.App.Validators
+@using Radzen.Blazor
+
+<body>
+    <RadzenTemplateForm TItem="string" Data=@_validationCode Submit="SubmitAsync">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div id="validation_data">
+            <label for="validation_code" class="label_style text_style">
+                A validation code has been sent to you via your email
+            </label>
+            <br />
+            <RadzenTextBox Name="validation_code" id="validation_code" Placeholder="XXXXXX"
+                   class="input_style" @bind-Value=@_validationCode />
+            <RadzenRequiredValidator Component="validation_code" Text="Validation code is required" class="no_popup_validation" />
+            <ValidationCodeValidator Component="validation_code" Text="Validation code does not have the correct format" class="no_popup_validation" />
+            <br />
+
+            <p class="text_style">
+                Didn't receive your code?
+            </p>
+            <button id="resend_button" class="button_style" type="button" @onclick=ResendCodeAsync>
+                Resend
+            </button>
+
+            @if (_showPasswordField)
+            {
+                <br />
+                <label for="password" class="label_style text_style">Password</label>
+                <br />
+                <RadzenTextBox type="password" id="password" Name="password" Placeholder="Password"
+                               class="input_style" @bind-Value=_password />
+                <RadzenRequiredValidator Component="password" Text="Password is required" class="no_popup_validation" />
+                <br />
+            }
+        </div>
+        <button id="submit_button" class="button_style" type="submit">
+            Submit
+        </button>
+    </RadzenTemplateForm>
+</body>

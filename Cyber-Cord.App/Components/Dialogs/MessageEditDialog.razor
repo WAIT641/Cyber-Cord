@@ -1,0 +1,11 @@
+﻿@using Radzen.Blazor
+
+<div id="form">
+    <h3 class="text_style">Edit Message</h3>
+
+    <RadzenTemplateForm Data="Model">
+        <label for="content" class="label_style text_style">Content:</label>
+        <br />
+        <RadzenTextArea id="content" Name="content" class="text_area" @bind-Value="Model.Content" />
+    </RadzenTemplateForm>
+</div>

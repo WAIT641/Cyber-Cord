@@ -1,0 +1,48 @@
+﻿#form {
+    width: 500px;
+    height: 250px;
+}
+
+.text_style {
+    font-weight: bold;
+    background: linear-gradient(to right, var(--color-text), var(--color-text-highlight), var(--color-text));
+    background-clip: text;
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    will-change: background-position;
+    animation: shine 1s linear infinite;
+}
+
+label.label_style {
+    margin-left: 10px;
+}
+
+@keyframes shine {
+    to {
+        background-position: 200% center;
+    }
+}
+
+input[type="color"].color_style {
+    margin: 5px;
+    border: solid 2px var(--color-border);
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    border: none;
+    padding: 0;
+    width: 40px;
+    height: 40px;
+    background: none;
+    cursor: pointer;
+}
+
+input[type="color"].color_style::-webkit-color-swatch-wrapper {
+    padding: 0;
+}
+
+#color_line_style {
+    display: flex;
+    align-items: center;
+}

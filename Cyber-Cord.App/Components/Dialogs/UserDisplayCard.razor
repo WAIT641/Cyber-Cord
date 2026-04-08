@@ -1,0 +1,26 @@
+﻿<div id="card_content_style">
+    <div id="card_header_style">
+        <Avatar User="Model.User" Clickable=false />
+        <h3 class="text_style">@Model.User.DisplayName</h3>
+    </div>
+    <div id="card_body_style">
+        <p class="text_style">
+            Account Name: @Model.User.Name
+        </p>
+        <div id="card_button_lane_style">
+            @if (_isFriendsWith)
+            {
+                <button class="button_style" id="ping_button_style" @onclick=PingAsync>
+                    Ping
+                </button>
+            }
+        </div>
+    </div>
+    <div id="card_footer_style">
+        Description:
+        <br />
+        @Model.User.Description
+    </div>
+</div>
+
+

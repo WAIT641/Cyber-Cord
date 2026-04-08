@@ -1,0 +1,105 @@
+﻿@page "/signup"
+
+@using Cyber_Cord.App.Validators
+@using Cyber_Cord.App.Components.Dialogs
+@using Radzen.Blazor
+@using Models
+@using Extensions
+@using Services
+@inject BorrowService BorrowService
+
+<body>
+    <RadzenTemplateForm TItem="UserCreateModel" Data=@_model Submit="SubmitAsync">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div id="signup_data">
+            <div id="left_pane_style" class="pane_style">
+
+                <label for="name" class="label_style text_style">Account Name</label>
+                <br>
+                <RadzenTextBox id="name" Name="name" Placeholder="Enter your name"
+                               class="input_style" @bind-Value="_model.Name" />
+                <RadzenRequiredValidator Component="name" Text="Account name is required" class="no_popup_validation" />
+                <NoWhiteSpaceValidator Component="name" Text="Account name cannot contain white space" class="no_popup_validation" />
+                <br>
+
+                <label for="display_name" class="label_style text_style">Display Name</label>
+                <br>
+                <RadzenTextBox type="text" id="display_name" Name="display_name"
+                               class="input_style" @bind-Value="_model.DisplayName" />
+                <RadzenRequiredValidator Component="display_name" Text="Display name is required" class="no_popup_validation" />
+                <br>
+
+                <label for="email" class="label_style text_style">Email</label>
+                <br>
+                <RadzenTextBox type="text" id="email" Name="email" Placeholder="Enter your email"
+                               class="input_style" @bind-Value="_model.Email" />
+                <RadzenRequiredValidator Component="email" Text="Email is required" class="no_popup_validation" />
+                <RadzenEmailValidator Component="email" Text="Provide a valid email address" class="no_popup_validation" />
+                <br>
+
+                <label for="password" class="label_style text_style">Password</label>
+                <br>
+                <RadzenTextBox type="password" id="password" Name="password" Placeholder="Enter your password"
+                               class="input_style" @bind-Value="_model.Password" />
+                <RadzenRequiredValidator Component="password" Text="Password is required" class="no_popup_validation" />
+                <RadzenCustomValidator Component="password" id="password_length_validator" class="no_popup_validation" Text=@_minPasswordLengthValidationText
+                                       Validator=@(() => PasswordHasValidLength(_model.Password))
+                />
+                <RadzenCustomValidator Component="password" class="no_popup_validation" Text="Password cannot contain any white space"
+                                       Validator=@(() => PasswordHasNoWhiteSpace(_model.Password))
+                />
+                <RadzenCustomValidator Component="password" class="no_popup_validation" Text="Password must contain lowercase letters"
+                                       Validator=@(() => PasswordHasLowerCase(_model.Password))
+                />
+                <RadzenCustomValidator Component="password" class="no_popup_validation" Text="Password must contain uppercase letters"
+                                       Validator=@(() => PasswordHasUpperCase(_model.Password))
+                />
+                <RadzenCustomValidator Component="password" class="no_popup_validation" Text="Password must contain numbers"
+                                       Validator=@(() => PasswordHasNumeric(_model.Password))
+                />
+                <RadzenCustomValidator Component="password" class="no_popup_validation" Text="Password must contain special characters"
+                                       Validator=@(() => PasswordHasSpecialChars(_model.Password))
+                />
+                <br>
+
+                <label for="confirmation" class="label_style text_style">Confirm Password</label>
+                <br>
+                <RadzenTextBox type="password" id="confirmation" Name="confirmation"
+                               class="input_style" @bind-Value="_passwordConfirmation" />
+                <RadzenRequiredValidator Component="confirmation" Text="Password confirmation is required" class="no_popup_validation" />
+                <RadzenCompareValidator Value=@_model.Password Component="confirmation" Text="Passwords do not match" class="no_popup_validation" />
+            </div>
+            <hr class="vertical_bar bar_style">
+            <div class="pane_style">
+                <div id="right_pane_style">
+                    <div class="right_partial_pane_style" id="right_top_partial_pane_style" style="background-color: @Color.AsHex("#")">
+                        <button id="color_picker_style" type="button" @onclick="OnOpenDialog">
+                        </button>
+                    </div>
+                    <hr class="horizontal_bar bar_style">
+                    <div class="right_partial_pane_style" id="right_bottom_partial_pane_style">
+                        <p class="text_style">Display Name: @ShortenText(_model.DisplayName, 20)</p>
+                        <div>
+                            <p class="text_style">Description: @ShortenText(_model.Description, 30)</p>
+                        </div>
+                    </div>
+                </div>
+                <div id="circle_style">
+                    @GetUserInitials()
+                </div>
+            </div>
+        </div>
+        <button id="back_button" class="button_style" type="reset">
+            Back <!-- TODO: back button --> <!-- REPLY: what? -->
+        </button>
+        <button id="signup_button" class="button_style" type="submit">
+            Sign Up
+        </button>
+    </RadzenTemplateForm>
+</body>
+
+@if (BorrowService.GetBorrowState<SignUpSettingsDialog, UserSettingsModel>().ShowingConfigureDialog)
+{
+    <Dialog TModel="@UserSettingsModel" TDialog="@SignUpSettingsDialog" OnConfirm="OnConfirmDialog" OnCancel="StateHasChanged" />
+}

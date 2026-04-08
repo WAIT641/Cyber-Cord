@@ -1,0 +1,6 @@
+﻿@if (User is not null)
+{
+    <div class="avatar_style" style="background-color: @GetUserBackColor(); color: @GetUserFrontColor();" @onclick=OnClickAsync>
+        @GetUserInitials()
+    </div>
+}
