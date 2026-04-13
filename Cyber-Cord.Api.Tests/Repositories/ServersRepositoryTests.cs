@@ -5,17 +5,13 @@ using Cyber_Cord.Api.Exceptions;
 using Cyber_Cord.Api.Models.Base;
 using Cyber_Cord.Api.Repositories;
 using Cyber_Cord.Api.Tests.Helpers;
+using Microsoft.EntityFrameworkCore;
 using Shared.Enums;
 
 namespace Cyber_Cord.Api.Tests.Repositories;
 
 public class ServersRepositoryTests : IDisposable
 {
-    // Note: ExecuteDeleteAsync is not supported by InMemoryDatabase.
-    // The following methods are therefore not tested:
-    //   DeleteServerAsync, DeleteUserServersForServerAsync, DeleteBansForServerAsync,
-    //   DeleteChannelAsync, DeleteChannelsForServerAsync,
-    //   DeleteMessagesForChannelAsync, DeleteMessagesForServerAsync
 
     private const int OwnerId = 1;
     private const int MemberId = 2;
@@ -44,8 +40,8 @@ public class ServersRepositoryTests : IDisposable
             UserName = $"user{id}@example.org",
             DisplayName = $"User{id}",
             BannerColor = Color.Black,
-            CreatedAt = DateTime.MinValue,
-            Description = $"Description for user {id}"
+            CreatedAt = DateTime.UtcNow,
+            Description = ""
         });
         await _context.SaveChangesAsync();
     }
@@ -74,18 +70,11 @@ public class ServersRepositoryTests : IDisposable
         await _context.SaveChangesAsync();
     }
 
-    private async Task<Channel> SeedChannelAsync(int id, int serverId, string name = "General")
+    private async Task SeedChannelAsync(int id, int serverId, string name = "General")
     {
-        var channel = new Channel
-        {
-            Id = id, 
-            Name = name, 
-            ServerId = serverId,
-            Description = $"Description for channel {id}"
-        };
+        var channel = new Channel { Id = id, Name = name, ServerId = serverId, Description = ""};
         _context.Channels.Add(channel);
         await _context.SaveChangesAsync();
-        return channel;
     }
 
     private async Task<Message> SeedMessageAsync(int id, int userId, int? channelId = null, int? chatId = null)
@@ -103,7 +92,7 @@ public class ServersRepositoryTests : IDisposable
         await _context.SaveChangesAsync();
         return message;
     }
-
+    
     [Fact]
     public async Task GetOwnedServersAsync_ReturnsOwnedServers()
     {
@@ -176,7 +165,7 @@ public class ServersRepositoryTests : IDisposable
 
         Assert.Empty(result);
     }
-    
+
     [Fact]
     public async Task GetServersByUserIdAsync_ReturnsServersForUser()
     {
@@ -218,7 +207,7 @@ public class ServersRepositoryTests : IDisposable
     [Fact]
     public async Task GetServerByIdAsync_ReturnsNull_WhenNotFound()
     {
-        await Assert.ThrowsAsync<NotFoundException>(async () =>await _repository.GetServerByIdAsync(ServerId));
+        await Assert.ThrowsAsync<NotFoundException>(async () => await _repository.GetServerByIdAsync(ServerId));
     }
     
     [Fact]
@@ -230,7 +219,7 @@ public class ServersRepositoryTests : IDisposable
         var result = await _repository.AddServerAsync(server);
 
         Assert.NotNull(result);
-        Assert.NotNull(await _context.Servers.FindAsync(result.Id));
+        Assert.NotNull(await _context.Servers.FirstOrDefaultAsync(x => x.Id == result.Id));
     }
     
     [Fact]
@@ -239,11 +228,11 @@ public class ServersRepositoryTests : IDisposable
         await SeedUserAsync(OwnerId);
         await SeedServerAsync(ServerId, OwnerId, "Original");
 
-        var server = await _context.Servers.FindAsync(ServerId);
+        var server = await _context.Servers.FirstOrDefaultAsync(x => x.Id == ServerId);
         server!.Name = "Updated";
         await _repository.SaveChangesAsync();
 
-        var persisted = await _context.Servers.FindAsync(ServerId);
+        var persisted = await _context.Servers.FirstOrDefaultAsync(x => x.Id == ServerId);
         Assert.Equal("Updated", persisted!.Name);
     }
     
@@ -346,7 +335,7 @@ public class ServersRepositoryTests : IDisposable
 
         Assert.Single(result);
     }
-    
+
     [Fact]
     public async Task AddUserServerAsync_AddsMembership()
     {
@@ -355,8 +344,9 @@ public class ServersRepositoryTests : IDisposable
         await SeedServerAsync(ServerId, OwnerId);
 
         await _repository.AddUserServerAsync(new UserServer { UserId = MemberId, ServerId = ServerId });
-        
-        await Assert.ThrowsAsync<NotFoundException>(async () => await _context.UserServers.FindAsync(MemberId, ServerId));
+
+        var result = await _context.UserServers.FirstOrDefaultAsync(x => x.UserId == MemberId && x.ServerId == ServerId);
+        Assert.NotNull(result);
     }
 
     [Fact]
@@ -367,10 +357,10 @@ public class ServersRepositoryTests : IDisposable
         await SeedServerAsync(ServerId, OwnerId);
         await SeedUserServerAsync(MemberId, ServerId);
 
-        var userServer = await _context.UserServers.FindAsync(MemberId, ServerId);
+        var userServer = await _context.UserServers.FirstOrDefaultAsync(x => x.UserId == MemberId && x.ServerId == ServerId);
         await _repository.RemoveUserServerAsync(userServer!);
 
-        var result = await _context.UserServers.FindAsync(MemberId, ServerId);
+        var result = await _context.UserServers.FirstOrDefaultAsync(x => x.UserId == MemberId && x.ServerId == ServerId);
         Assert.Null(result);
     }
     
@@ -472,10 +462,9 @@ public class ServersRepositoryTests : IDisposable
         await SeedUserAsync(MemberId);
         await SeedServerAsync(ServerId, OwnerId);
 
-        var bus = new BanUserServer { UserId = MemberId, ServerId = ServerId };
-        await _repository.AddBanAsync(bus);
+        await _repository.AddBanAsync(new BanUserServer { UserId = MemberId, ServerId = ServerId });
 
-        var result = await _context.BanUserServers.FindAsync(bus);
+        var result = await _context.BanUserServers.FirstOrDefaultAsync(x => x.UserId == MemberId && x.ServerId == ServerId);
         Assert.NotNull(result);
     }
 
@@ -487,14 +476,13 @@ public class ServersRepositoryTests : IDisposable
         await SeedServerAsync(ServerId, OwnerId);
         await SeedBanAsync(MemberId, ServerId);
 
-        var ban = await _context.BanUserServers.FindAsync(MemberId, ServerId);
+        var ban = await _context.BanUserServers.FirstOrDefaultAsync(x => x.UserId == MemberId && x.ServerId == ServerId);
         await _repository.RemoveBanAsync(ban!);
 
-        var result = await _context.BanUserServers.FindAsync(MemberId, ServerId);
+        var result = await _context.BanUserServers.FirstOrDefaultAsync(x => x.UserId == MemberId && x.ServerId == ServerId);
         Assert.Null(result);
     }
     
-
     [Fact]
     public async Task ChannelExistsAsync_ReturnsTrue_WhenExists()
     {
@@ -549,7 +537,7 @@ public class ServersRepositoryTests : IDisposable
 
         Assert.Null(result);
     }
-    
+
     [Fact]
     public async Task GetChannelsByServerIdAsync_ReturnsChannels()
     {
@@ -574,13 +562,13 @@ public class ServersRepositoryTests : IDisposable
 
         Assert.Empty(result);
     }
-    
+
     [Fact]
     public async Task GetChannelReturnModelAsync_ReturnsModel()
     {
         await SeedUserAsync(OwnerId);
         await SeedServerAsync(ServerId, OwnerId);
-        await SeedChannelAsync(ChannelId, ServerId, "General");
+        await SeedChannelAsync(ChannelId, ServerId);
 
         var result = await _repository.GetChannelReturnModelAsync(ChannelId, ServerId);
 
@@ -604,11 +592,11 @@ public class ServersRepositoryTests : IDisposable
         await SeedUserAsync(OwnerId);
         await SeedServerAsync(ServerId, OwnerId);
 
-        var channel = new Channel { Name = "NewChannel", ServerId = ServerId };
+        var channel = new Channel { Name = "NewChannel", ServerId = ServerId, Description = ""};
         var result = await _repository.AddChannelAsync(channel);
 
         Assert.NotNull(result);
-        Assert.NotNull(await _context.Channels.FindAsync(result.Id));
+        Assert.NotNull(await _context.Channels.FirstOrDefaultAsync(x => x.Id == result.Id));
     }
     
     [Fact]
@@ -657,7 +645,7 @@ public class ServersRepositoryTests : IDisposable
 
         Assert.Empty(result.Data);
     }
-
+    
     [Fact]
     public async Task AddMessageAsync_AddsMessage()
     {
@@ -676,9 +664,9 @@ public class ServersRepositoryTests : IDisposable
         var result = await _repository.AddMessageAsync(message);
 
         Assert.NotNull(result);
-        Assert.NotNull(await _context.Messages.FindAsync(result.Id));
+        Assert.NotNull(await _context.Messages.FirstOrDefaultAsync(x => x.Id == result.Id));
     }
-
+    
     [Fact]
     public async Task RemoveMessageAsync_RemovesMessage()
     {
@@ -689,6 +677,6 @@ public class ServersRepositoryTests : IDisposable
 
         await _repository.RemoveMessageAsync(message);
 
-        Assert.Null(await _context.Messages.FindAsync(MessageId));
+        Assert.Null(await _context.Messages.FirstOrDefaultAsync(x => x.Id == MessageId));
     }
 }
