@@ -6,11 +6,15 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>Cyber_Cord.Api</RootNamespace>
     <UserSecretsId>dd99b95d-4929-4dd9-8fa7-360777ba943b</UserSecretsId>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
   </PropertyGroup>
 
   <ItemGroup>
     <Compile Remove="Enums\**" />
     <Content Remove="Enums\**" />
+    <Content Include="..\.dockerignore">
+      <Link>.dockerignore</Link>
+    </Content>
     <EmbeddedResource Remove="Enums\**" />
     <None Remove="Enums\**" />
   </ItemGroup>

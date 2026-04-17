@@ -1,0 +1,13 @@
+﻿services:
+  cyber-cord.api:
+    image: cyber-cord.api
+    build:
+      context: .
+      dockerfile: Cyber-Cord.Api/Dockerfile
+
+  cyber-cord.app:
+    image: cyber-cord.app
+    build:
+      context: .
+      dockerfile: Cyber-Cord.App/Dockerfile
+
