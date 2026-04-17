@@ -35,6 +35,16 @@
       - sql_server_data:/var/opt/mssql/data
       - sql_server_log:/var/opt/mssql/log
       - sql_server_secrets:/var/opt/mssql/secrets
+  
+  livekit:
+    image: livekit/livekit-server:latest
+    command: --dev --bind 127.0.0.1
+    ports:
+      - "7880:7880"
+      - "7881:7881"
+      - "50000-50020:50000-50020/udp"
+    hostname: livekit
+    
       
 volumes:
   sql_server_data:
