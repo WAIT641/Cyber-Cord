@@ -31,3 +31,12 @@
     restart: always
     ports:
       - "1433:1433"
+    volumes:
+      - sql_server_data:/var/opt/mssql/data
+      - sql_server_log:/var/opt/mssql/log
+      - sql_server_secrets:/var/opt/mssql/secrets
+      
+volumes:
+  sql_server_data:
+  sql_server_log:
+  sql_server_secrets:
