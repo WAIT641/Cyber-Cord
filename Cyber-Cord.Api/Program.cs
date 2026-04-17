@@ -196,6 +196,12 @@ builder.Services.AddHttpClient();
 
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    db.Database.Migrate();
+}
+
 SeedService.SeedAdminAsync(app.Services);
 
 // Configure the HTTP request pipeline.

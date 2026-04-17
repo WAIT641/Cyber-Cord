@@ -4,10 +4,30 @@
     build:
       context: .
       dockerfile: Cyber-Cord.Api/Dockerfile
+    volumes: 
+      - $APPDATA/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+      - $USERPROFILE/.aspnet/https:/https:ro
+    depends_on:
+      - database
+    ports:
+      - "8080:8080"
+      - "8081:8081"
+    hostname: api
+    environment:
+      - ASPNETCORE_URLS=http://+:8080;https://+:8081
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=yourpassword
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
 
-  cyber-cord.app:
-    image: cyber-cord.app
-    build:
-      context: .
-      dockerfile: Cyber-Cord.App/Dockerfile
-
+  
+  database:
+    image: "mcr.microsoft.com/mssql/server:2022-latest"
+    user: root
+    container_name: sql_server
+    hostname: database
+    environment:
+      - ACCEPT_EULA=y
+      - SA_PASSWORD=e65e2709-9b47-44dc-a0f8-780830ff000f
+      - MSQL_PID=Express
+    restart: always
+    ports:
+      - "1433:1433"
