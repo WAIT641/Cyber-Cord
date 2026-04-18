@@ -49,8 +49,14 @@
       - "7882:7882"
       - "50000-50020:50000-50020/udp"
     hostname: livekit
-    environment:
-      LIVEKIT_KEYS: "devkey: apiSecretmustbeatleast256bitslongCurrentlyitis48bitslong"
+      
+  coturn:
+    image: coturn/coturn:latest
+    container_name: coturn
+    network_mode: host   # needs host network for TURN to work properly
+    volumes:
+      - ./coturn.conf:/etc/coturn/turnserver.conf
+    restart: always
     
 
       
