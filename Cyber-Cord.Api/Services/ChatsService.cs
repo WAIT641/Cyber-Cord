@@ -14,8 +14,7 @@ public class ChatsService(
     IUsersRepository usersRepository,
     IWebSocketHandler handler,
     ICurrentUserContext userContext,
-    IUnitOfWork uow,
-    ICallService callService
+    IUnitOfWork uow
 ) : IChatsService
 {
     private int UserId => userContext.GetId();
@@ -196,23 +195,6 @@ public class ChatsService(
         await repository.DeleteMessageFromChatAsync(messageId);
 
         await NotifyChatMembersAboutMessageAsync(chatId, messageId, WebSocketMessageActionModel.ActionType.Removed);
-    }
-
-    public async Task HandleCall(int chatId, CallMessageModel model)
-    {
-        await CheckAccessToChatAsync(chatId);
-        
-        // TODO: for now just one on one, add support for multiple connections
-        var users = await GetChatUsersAsync(chatId);
-
-        if (users.Count == 2)
-        {
-            var otherUser = users.Where(x => x.Id != UserId).FirstOrDefault();
-            if (otherUser is null)
-                throw new BadRequestException("Cannot start call without other person");
-            
-            callService.HandleP2PCall(model.OriginatingUserId, otherUser.Id, model);
-        }
     }
 
     // === End of public API ===

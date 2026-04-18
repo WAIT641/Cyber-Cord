@@ -18,5 +18,4 @@ public interface IChatsService
     Task DeleteChatAsync(int chatId);
     Task RemoveUserFromChatAsync(int chatId, int userId);
     Task DeleteMessageFromChatAsync(int chatId, int messageId);
-    Task HandleCall(int callStarter, CallMessageModel model);
 }

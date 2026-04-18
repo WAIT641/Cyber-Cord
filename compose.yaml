@@ -1,5 +1,6 @@
 ﻿services:
   cyber-cord.api:
+    container_name: api
     image: cyber-cord.api
     build:
       context: .
@@ -37,14 +38,21 @@
       - sql_server_secrets:/var/opt/mssql/secrets
   
   livekit:
+    container_name: livekit
     image: livekit/livekit-server:latest
-    command: --dev --bind 127.0.0.1
+    command: --config /etc/livekit.yaml --bind 0.0.0.0
+    volumes:
+      - ./livekit.yaml:/etc/livekit.yaml
     ports:
       - "7880:7880"
       - "7881:7881"
+      - "7882:7882"
       - "50000-50020:50000-50020/udp"
     hostname: livekit
+    environment:
+      LIVEKIT_KEYS: "devkey: apiSecretmustbeatleast256bitslongCurrentlyitis48bitslong"
     
+
       
 volumes:
   sql_server_data:

@@ -14,6 +14,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{58453D5B-7E76-404E-872B-B6B66B1A5E99}"
 	ProjectSection(SolutionItems) = preProject
 		compose.yaml = compose.yaml
+		livekit.yaml = livekit.yaml
 	EndProjectSection
 EndProject
 Global

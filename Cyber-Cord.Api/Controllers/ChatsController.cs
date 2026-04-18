@@ -108,12 +108,4 @@ public class ChatsController(IChatsService service) : BaseAuthorizationControlle
 
         return NoContent();
     }
-
-    [HttpPost("{id}/call")]
-    public async Task<IActionResult> HandleCall(int id, [FromBody] CallMessageModel messageModel)
-    {
-        await service.HandleCall(id, messageModel);
-        
-        return Ok();
-    }
 }

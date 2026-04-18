@@ -88,7 +88,6 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 
 builder.Services.AddMemoryCache();
 
-builder.Services.AddScoped<ICallService, CallService>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IUsersRepository, UsersRepository>();
 builder.Services.AddScoped<IUsersService,UsersService>();
@@ -101,9 +100,14 @@ builder.Services.AddSingleton<WebSocketHandler>();
 builder.Services.AddSingleton<IWebSocketHandler>(sp => sp.GetRequiredService<WebSocketHandler>());
 builder.Services.AddScoped<ICurrentUserContext, CurrentUserContext>();
 builder.Services.AddScoped<IUserJobs, UserJobs>();
+builder.Services.AddScoped<IVoiceService, VoiceService>();
+
 
 builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+
+builder.Services.Configure<LiveKitSettings>(
+    builder.Configuration.GetSection(LiveKitSettings.Section));
 
 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 {

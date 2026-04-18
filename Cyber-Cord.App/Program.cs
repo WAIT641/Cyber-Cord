@@ -31,7 +31,6 @@ builder.Services.AddScoped<BorrowService>();
 builder.Services.AddScoped<SpinnerService>();
 builder.Services.AddScoped<ErrorProviderService>();
 builder.Services.AddScoped<SoundNotificationService>();
-builder.Services.AddScoped<CallHandlerService>();
 
 builder.Services.AddBlazorContextMenu();
 

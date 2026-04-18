@@ -39,9 +39,7 @@ public partial class Home : ComponentBase, IDisposable
 
     [Inject]
     private UserSettingsService UserSettingsService { get; set; } = default!;
-
-    [Inject] 
-    private CallHandlerService CallHandlerService { get; set; } = default!;
+    
 
     [CascadingParameter]
     public EventCallback UpdateState { get; set; }
@@ -127,22 +125,6 @@ public partial class Home : ComponentBase, IDisposable
 
         if (_chats.Count > 0)
             await SelectChatByIndexAsync(0);
-        
-        // Calls
-
-        CallHandlerService = new(JsRuntime, WebSocketService, ApiService);
-        
-        CallHandlerService.OnStateChanged  += () => InvokeAsync(StateHasChanged);
-        CallHandlerService.OnCallEnded     += () => InvokeAsync(StateHasChanged);
-
-        // This is where you add your custom behaviour
-        CallHandlerService.OnIncomingCall  += async (chatId) =>
-        {
-            await InvokeAsync(StateHasChanged);
-            await SoundNotificationService.PlayNotificationAsync(NotificationSound.Default);
-        };
-
-        await CallHandlerService.InitialiseAsync();
     }
 
     private async Task WebSocketService_ReceivedMessageAsync(WebsocketMessageModel model)
@@ -180,7 +162,7 @@ public partial class Home : ComponentBase, IDisposable
                 await WebSocketServerReloadAsync(server);
                 break;
             case WebSocketCallMessageModel call:
-                await CallHandlerService.HandleWebSocketCallMessageAsync(call);
+                
                 break;
         }
     }
@@ -1166,14 +1148,6 @@ public partial class Home : ComponentBase, IDisposable
         {
             await ErrorProviderService.ShowErrorAsync(UpdateState, "Could not remove this message");
         }
-    }
-
-    private async Task StartCall()
-    {
-        if (selectedChatId is null)
-            return;
-        
-        await CallHandlerService.CallAsync(selectedChatId!.Value);
     }
 
     private void OnMessageUpdate(MessageModel model)

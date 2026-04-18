@@ -1,0 +1,207 @@
+@inject IJSRuntime JS
+@inject IHttpClientFactory HttpClientFactory
+@inject IOptions<RouteOptions> Options
+@using Cyber_Cord.App.Options
+@using Microsoft.Extensions.Options
+@implements IAsyncDisposable
+@page "/calls"
+
+<div class="voice-channel">
+    <div class="voice-channel-header">
+        <span class="channel-name">🔊 @ChannelName</span>
+
+        @if (!_isConnected)
+        {
+            <button class="btn-join" @onclick="JoinAsync" disabled="@_isBusy">
+                @(_isBusy ? "Connecting..." : "Join")
+            </button>
+        }
+        else
+        {
+            <button class="btn-mute" @onclick="ToggleMuteAsync">
+                @(_isMuted ? "🔇 Unmute" : "🎙️ Mute")
+            </button>
+            <button class="btn-leave" @onclick="LeaveAsync">
+                Leave
+            </button>
+        }
+    </div>
+
+    @if (_errorMessage is not null)
+    {
+        <div class="voice-error">@_errorMessage</div>
+    }
+
+    @if (_participants.Count > 0)
+    {
+        <ul class="participant-list">
+            @foreach (var p in _participants.Values)
+            {
+                <li class="participant @(p.IsSpeaking ? "speaking" : "") @(p.IsMuted ? "muted" : "")">
+                    <span class="participant-avatar">@p.DisplayName[0]</span>
+                    <span class="participant-name">@p.DisplayName</span>
+                    @if (p.IsMuted) { <span class="mute-icon">🔇</span> }
+                    @if (p.IsSpeaking) { <span class="speaking-icon">🔊</span> }
+                </li>
+            }
+        </ul>
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired] public string ChannelId  { get; set; } = default!;
+    [Parameter, EditorRequired] public string ChannelName { get; set; } = default!;
+
+    // -------------------------------------------------------------------------
+    // State
+    // -------------------------------------------------------------------------
+
+    private bool _isConnected  = false;
+    private bool _isMuted      = false;
+    private bool _isBusy       = false;
+    private string? _errorMessage;
+
+    private DotNetObjectReference<VoiceChannel>? _dotnetRef;
+
+    private record ParticipantState(string Identity, string DisplayName, bool IsMuted, bool IsSpeaking);
+    private Dictionary<string, ParticipantState> _participants = new();
+
+    // -------------------------------------------------------------------------
+    // Join / Leave
+    // -------------------------------------------------------------------------
+
+    private async Task JoinAsync()
+    {
+        _isBusy = true;
+        _errorMessage = null;
+        StateHasChanged();
+        var Http = HttpClientFactory.CreateClient();
+
+        try
+        {
+            // 1. Get token from our API
+            var response = await Http.PostAsync($"{Options.Value.BaseApiRoute}/voice/rooms/abc/token", null);
+            if (!response.IsSuccessStatusCode)
+            {
+                _errorMessage = "Failed to get voice token.";
+                return;
+            }
+
+            var tokenDto = await response.Content.ReadFromJsonAsync<VoiceTokenDto>();
+            if (tokenDto is null) { _errorMessage = "Invalid token response."; return; }
+
+            // 2. Connect via JS interop
+            _dotnetRef = DotNetObjectReference.Create(this);
+            var result = await JS.InvokeAsync<ConnectResult>(
+                "livekitInterop.connect",
+                tokenDto.ServerUrl,
+                tokenDto.Token,
+                _dotnetRef);
+
+            if (!result.Success)
+            {
+                _errorMessage = $"Connection failed: {result.Error}";
+                return;
+            }
+
+            // 3. Populate existing participants
+            if (result.Participants is not null)
+            {
+                foreach (var p in result.Participants)
+                    _participants[p.Identity] = new ParticipantState(p.Identity, p.Name, false, false);
+            }
+
+            _isConnected = true;
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"Unexpected error: {ex.Message}";
+        }
+        finally
+        {
+            _isBusy = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task LeaveAsync()
+    {
+        await JS.InvokeVoidAsync("livekitInterop.disconnect");
+        _isConnected = false;
+        _isMuted     = false;
+        _participants.Clear();
+        StateHasChanged();
+    }
+
+    private async Task ToggleMuteAsync()
+    {
+        _isMuted = !_isMuted;
+        await JS.InvokeVoidAsync("livekitInterop.setMuted", _isMuted);
+        StateHasChanged();
+    }
+
+    // -------------------------------------------------------------------------
+    // JS → Blazor callbacks
+    // -------------------------------------------------------------------------
+
+    [JSInvokable]
+    public void OnParticipantJoined(string identity, string displayName)
+    {
+        _participants[identity] = new ParticipantState(identity, displayName, false, false);
+        InvokeAsync(StateHasChanged);
+    }
+
+    [JSInvokable]
+    public void OnParticipantLeft(string identity)
+    {
+        _participants.Remove(identity);
+        InvokeAsync(StateHasChanged);
+    }
+
+    [JSInvokable]
+    public void OnActiveSpeakersChanged(List<string> speakerIdentities)
+    {
+        var speakerSet = speakerIdentities.ToHashSet();
+        foreach (var key in _participants.Keys.ToList())
+        {
+            var p = _participants[key];
+            _participants[key] = p with { IsSpeaking = speakerSet.Contains(key) };
+        }
+        InvokeAsync(StateHasChanged);
+    }
+
+    [JSInvokable]
+    public void OnParticipantMuteChanged(string identity, bool isMuted)
+    {
+        if (_participants.TryGetValue(identity, out var p))
+            _participants[identity] = p with { IsMuted = isMuted };
+        InvokeAsync(StateHasChanged);
+    }
+
+    [JSInvokable]
+    public void OnDisconnected()
+    {
+        _isConnected = false;
+        _participants.Clear();
+        InvokeAsync(StateHasChanged);
+    }
+
+    // -------------------------------------------------------------------------
+    // Cleanup
+    // -------------------------------------------------------------------------
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_isConnected)
+            await JS.InvokeVoidAsync("livekitInterop.disconnect");
+        _dotnetRef?.Dispose();
+    }
+
+    // -------------------------------------------------------------------------
+    // JS result DTOs (local to this component)
+    // -------------------------------------------------------------------------
+
+    private record ConnectResult(bool Success, string? Error, List<RemoteParticipantDto>? Participants);
+    private record RemoteParticipantDto(string Identity, string Name);
+    private record VoiceTokenDto(string Token, string RoomId, string ServerUrl);
+}
