@@ -775,15 +775,20 @@ public class ApiService(IHttpClientFactory httpClientFactory, SessionState sessi
         
         _ = await client.PostAsJsonAsync($"{_baseRoute}/chats/{chatId}/call", message);
     }
+
+    public async Task<VoiceTokenModel?> GetChatVoiceTokenAsync(int chatId)
+    {
+        return await GetAsync<VoiceTokenModel>($"{_baseRoute}/chats/{chatId}/voice");
+    }
     
-    public async Task AcceptCall(int chatId, string Sdp)
+    public async Task AcceptCall(int chatId, string sdp)
     {
         var client = httpClientFactory.CreateClient();
 
         var message = new CallMessageModel()
         {
             Type = CallMessageModel.MessageType.Accept,
-            Sdp = Sdp
+            Sdp = sdp
         };
 
         _ = await client.PostAsJsonAsync($"{_baseRoute}/chats/{chatId}/call", message);
