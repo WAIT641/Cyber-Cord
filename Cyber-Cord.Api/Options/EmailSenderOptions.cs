@@ -2,6 +2,7 @@
 
 public class EmailSenderOptions
 {
+    public const string Section = "EmailSender";
     public string? EmailAuthKey { get; set; }
     public string EmailHost { get; set; } = default!;
     public string SourceEmailAddress { get; set; } = default!;

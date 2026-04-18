@@ -78,9 +78,19 @@ builder.Services.AddHangfire(config => config
 // Add Hangfire Server (background job worker)
 builder.Services.AddHangfireServer();
 
-builder.Services.Configure<EmailSenderOptions>(builder.Configuration.GetSection("EmailSender"));
-builder.Services.Configure<ActivationCodeOptions>(builder.Configuration.GetSection("ActivationCode"));
-builder.Services.Configure<Cyber_Cord.Api.Options.PasswordOptions>(builder.Configuration.GetSection("PasswordOptions"));
+builder.Services.Configure<EmailSenderOptions>(
+    builder.Configuration.GetSection(EmailSenderOptions.Section)
+    );
+builder.Services.Configure<ActivationCodeOptions>(
+    builder.Configuration.GetSection(ActivationCodeOptions.Section)
+    );
+builder.Services.Configure<Cyber_Cord.Api.Options.PasswordOptions>(
+    builder.Configuration.GetSection(Cyber_Cord.Api.Options.PasswordOptions.Section)
+    );
+builder.Services.Configure<LiveKitOptions>(
+    builder.Configuration.GetSection(LiveKitOptions.Section)
+    );
+
 builder.Services.AddScoped<ICustomEmailSender, EmailSender>();
 builder.Services.AddScoped<ICustomPasswordHasher, PasswordHasher>();
 builder.Services.AddScoped<ITokenProvider, TokenProvider>();
@@ -105,9 +115,6 @@ builder.Services.AddScoped<IVoiceService, VoiceService>();
 
 builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
-
-builder.Services.Configure<LiveKitSettings>(
-    builder.Configuration.GetSection(LiveKitSettings.Section));
 
 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 {

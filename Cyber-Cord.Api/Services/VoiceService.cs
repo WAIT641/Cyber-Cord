@@ -1,37 +1,25 @@
-using Cyber_Cord.Api.Services;
 using Livekit.Server.Sdk.Dotnet;
 using Microsoft.Extensions.Options;
 using ListRoomsRequest = Livekit.Server.Sdk.Dotnet.ListRoomsRequest;
 
-public class VoiceService : IVoiceService
-{
-    private readonly LiveKitSettings _settings;
-    private readonly RoomServiceClient _roomClient;
-    private ICurrentUserContext _userContext;
-    private IUsersService _usersService;
+namespace Cyber_Cord.Api.Services;
 
-    private int UserId => _userContext.GetId();
-    
-    public VoiceService(IOptions<LiveKitSettings> settings, ICurrentUserContext context, IUsersService service)
-    {
-        _settings = settings.Value;
-        _roomClient = new RoomServiceClient(_settings.ServerUrl, _settings.ApiKey, _settings.ApiSecret);
-        _userContext = context;
-        _usersService = service;
-    }
-
-    // -------------------------------------------------------------------------
-    // Token generation
-    // -------------------------------------------------------------------------
+public class VoiceService(IOptions<LiveKitOptions> options, IUsersService usersService) : IVoiceService {
+    private LiveKitOptions _options => options.Value;
+    private readonly RoomServiceClient _roomClient = new(
+        options.Value.ServerUrl,
+        options.Value.ApiKey,
+        options.Value.ApiSecret
+        );
 
     public async Task<VoiceTokenDto> GenerateTokenAsync(string roomId)
     {
-        var user = await _usersService.GetCurrentUserAsync();
+        var user = await usersService.GetCurrentUserAsync();
         
-        var token = new AccessToken(_settings.ApiKey, _settings.ApiSecret)
+        var token = new AccessToken(_options.ApiKey, _options.ApiSecret)
             .WithIdentity(user.Id.ToString())
             .WithName(user.DisplayName)
-            .WithTtl(TimeSpan.FromHours(_settings.TokenTtlHours))
+            .WithTtl(TimeSpan.FromHours(_options.TokenTtlHours))
             .WithGrants(new VideoGrants
             {
                 RoomJoin  = true,
@@ -53,10 +41,6 @@ public class VoiceService : IVoiceService
         return voiceToken;
     }
 
-    // -------------------------------------------------------------------------
-    // Room info
-    // -------------------------------------------------------------------------
-
     public async Task<RoomInfoDto> GetRoomInfoAsync(string roomId)
     {
         var request = new ListRoomsRequest();
@@ -75,10 +59,6 @@ public class VoiceService : IVoiceService
         );
     }
 
-    // -------------------------------------------------------------------------
-    // Participants
-    // -------------------------------------------------------------------------
-
     public async Task<IEnumerable<ParticipantDto>> GetParticipantsAsync(string roomId)
     {
         var request = new ListParticipantsRequest { Room = roomId };
@@ -92,10 +72,6 @@ public class VoiceService : IVoiceService
             JoinedAt:    DateTimeOffset.FromUnixTimeSeconds(p.JoinedAt).UtcDateTime
         ));
     }
-
-    // -------------------------------------------------------------------------
-    // Moderation
-    // -------------------------------------------------------------------------
 
     public async Task RemoveParticipantAsync(string roomId, string userId)
     {
