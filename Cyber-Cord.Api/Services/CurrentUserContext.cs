@@ -1,41 +1,64 @@
-﻿using Microsoft.IdentityModel.JsonWebTokens;
+﻿using System.Reflection.PortableExecutable;
+using Microsoft.IdentityModel.JsonWebTokens;
 
 namespace Cyber_Cord.Api.Services;
 
 public class CurrentUserContext(IHttpContextAccessor context) : ICurrentUserContext
 {
     private int? _id;
-    public string? _name;
+    private string? _name;
+    private string? _displayName; 
 
-    public int GetId()
+    public int GetId() => GetClaim(
+        JwtRegisteredClaimNames.Sub,
+        () => _id,
+        (str) => _id = int.Parse(str)
+    );
+
+    public string GetName() => GetClaim(
+        JwtRegisteredClaimNames.Name,
+        () => _name,
+        (str) => _name = str
+    );
+
+    public string GetDisplayName() => GetClaim(
+        JwtRegisteredClaimNames.PreferredUsername,
+        () => _displayName,
+        (str) => _displayName = str
+    );
+
+    private T GetClaim<T>(string name, Func<T?> getter, Action<string> setter) where T : struct
     {
-        if (_id.HasValue)
-            return _id.Value;
-
-        var userIdClaim = GetClaim(JwtRegisteredClaimNames.Sub);
-
-        _id = int.Parse(userIdClaim);
-        return _id.Value;
+        if (getter() is not null)
+        {
+            return (T)getter()!;
+        }
+        
+        LoadClaim(name, setter);
+        
+        return (T)getter()!;
+    }
+    
+    private T GetClaim<T>(string name, Func<T?> getter, Action<string> setter) where T : class
+    {
+        if (getter() is not null)
+        {
+            return getter()!;
+        }
+        
+        LoadClaim(name, setter);
+        
+        return getter()!;
     }
 
-    public string GetName()
-    {
-        if (_name is not null)
-            return _name;
-
-        var userNameClaim = GetClaim(JwtRegisteredClaimNames.Name);
-
-        return userNameClaim;
-    }
-
-    private string GetClaim(string name)
+    private void LoadClaim(string name, Action<string> setter)
     {
         var claim = context.HttpContext?.User
             .FindFirst(name)?.Value;
 
         if (string.IsNullOrEmpty(claim))
             throw new UnauthorizedAccessException($"Unable to access {name} claim");
-
-        return claim;
+        
+        setter(claim);
     }
 }

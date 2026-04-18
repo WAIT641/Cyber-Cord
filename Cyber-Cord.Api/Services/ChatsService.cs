@@ -1,10 +1,10 @@
-﻿using Cyber_Cord.Api.Exceptions;
+﻿using Cyber_Cord.Api.Entities;
+using Cyber_Cord.Api.Exceptions;
 using Cyber_Cord.Api.Models;
 using Cyber_Cord.Api.Models.Base;
 using Cyber_Cord.Api.Repositories;
 using Cyber_Cord.Api.Types.Interfaces;
 using Shared.Models;
-using Shared.Models.ApiModels;
 using Shared.Types.Interfaces;
 
 namespace Cyber_Cord.Api.Services;
@@ -12,6 +12,7 @@ namespace Cyber_Cord.Api.Services;
 public class ChatsService(
     IChatsRepository repository,
     IUsersRepository usersRepository,
+    IVoiceService voiceService,
     IWebSocketHandler handler,
     ICurrentUserContext userContext,
     IUnitOfWork uow
@@ -48,6 +49,13 @@ public class ChatsService(
         await CheckAccessToChatAsync(chatId);
 
         return await repository.GetChatMessagesAsync(chatId, filter);
+    }
+
+    public async Task<VoiceTokenDto> GetChatVoiceTokenAsync(int chatId)
+    {
+        await CheckAccessToChatAsync(chatId);
+
+        return await voiceService.GenerateTokenAsync<Chat>(chatId);
     }
 
     public async Task<ChatReturnModel> CreateChatAsync(ChatCreateModel model)

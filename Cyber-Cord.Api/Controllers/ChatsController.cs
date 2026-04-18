@@ -43,6 +43,14 @@ public class ChatsController(IChatsService service) : BaseAuthorizationControlle
         return Ok(result);
     }
 
+    [HttpGet("{id}/voice")]
+    public async Task<IActionResult> GetChatVoiceToken(int id)
+    {
+        var result = await service.GetChatVoiceTokenAsync(id);
+
+        return Ok(result);
+    }
+
     [HttpPost]
     public async Task<IActionResult> CreateChat([FromBody] ChatCreateModel model)
     {

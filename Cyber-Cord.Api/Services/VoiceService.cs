@@ -4,22 +4,25 @@ using ListRoomsRequest = Livekit.Server.Sdk.Dotnet.ListRoomsRequest;
 
 namespace Cyber_Cord.Api.Services;
 
-public class VoiceService(IOptions<LiveKitOptions> options, IUsersService usersService) : IVoiceService {
-    private LiveKitOptions _options => options.Value;
+public class VoiceService(IOptions<LiveKitOptions> options, ICurrentUserContext userContext) : IVoiceService {
+    private LiveKitOptions Options => options.Value;
     private readonly RoomServiceClient _roomClient = new(
         options.Value.ServerUrl,
         options.Value.ApiKey,
         options.Value.ApiSecret
         );
 
+    public async Task<VoiceTokenDto> GenerateTokenAsync<T>(int baseId)
+    {
+        return await GenerateTokenAsync(typeof(T).Name + baseId);
+    }
+
     public async Task<VoiceTokenDto> GenerateTokenAsync(string roomId)
     {
-        var user = await usersService.GetCurrentUserAsync();
-        
-        var token = new AccessToken(_options.ApiKey, _options.ApiSecret)
-            .WithIdentity(user.Id.ToString())
-            .WithName(user.DisplayName)
-            .WithTtl(TimeSpan.FromHours(_options.TokenTtlHours))
+        var token = new AccessToken(Options.ApiKey, Options.ApiSecret)
+            .WithIdentity(userContext.GetId().ToString())
+            .WithName(userContext.GetDisplayName())
+            .WithTtl(TimeSpan.FromHours(Options.TokenTtlHours))
             .WithGrants(new VideoGrants
             {
                 RoomJoin  = true,
