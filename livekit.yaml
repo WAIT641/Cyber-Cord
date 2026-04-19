@@ -6,3 +6,17 @@ rtc:
   port_range_end: 50020
   use_external_ip: false
   node_ip: 127.0.0.1
+  turn_servers:
+    - host: 127.0.0.1
+      port: 3478
+      protocol: udp
+      username: cybercord
+      credential: turnsecret
+
+turn:
+  enabled: true
+  domain: 127.0.0.1
+  udp_port: 3478
+
+keys:
+  devkey: apiSecretmustbeatleast256bitlongCurrentlyitis48bitslong
