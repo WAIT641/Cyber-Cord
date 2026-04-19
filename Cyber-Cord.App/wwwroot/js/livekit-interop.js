@@ -50,6 +50,22 @@ livekitInterop = (() => {
                 dotnetRef.invokeMethodAsync('OnDisconnected');
             });
 
+            room.on(LivekitClient.RoomEvent.TrackSubscribed, (track, _pub, participant) => {
+                if (track.kind === LivekitClient.Track.Kind.Audio) {
+                    track.attach();
+                }
+                if (track.kind === LivekitClient.Track.Kind.Video) {
+                    const container = document.getElementById(`participant-${participant.identity}`);
+                    if (container) {
+                        const el = track.attach();
+                        el.style.width = '100%';
+                        el.style.borderRadius = '8px';
+                        container.appendChild(el);
+                    }
+                }
+                dotnetRef.invokeMethodAsync('OnParticipantJoined', participant.identity, participant.name);
+            });
+
             await room.connect(serverUrl, token);
             await room.localParticipant.setMicrophoneEnabled(true);
 
@@ -83,5 +99,11 @@ livekitInterop = (() => {
         return room !== null && room.state === LivekitClient.ConnectionState.Connected;
     }
 
-    return { connect, disconnect, setMuted, isConnected };
+    async function setCameraEnabled(enabled) {
+        if (room) {
+            await room.localParticipant.setCameraEnabled(enabled);
+        }
+    }
+
+    return { connect, disconnect, setMuted, setCameraEnabled, isConnected };
 })();
