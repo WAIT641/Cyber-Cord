@@ -153,6 +153,16 @@
         StateHasChanged();
     }
 
+    private async Task SetSettings(bool echoCancelation, bool noiseSuppresion, bool autoGain)
+    {
+        await JS.InvokeVoidAsync("livekitInterop.setAudioProcessing", new {
+            echoCancellation = echoCancelation,
+            noiseSuppression = noiseSuppresion,
+            autoGainControl = autoGain
+        });
+    }
+    
+
     // -------------------------------------------------------------------------
     // JS → Blazor callbacks
     // -------------------------------------------------------------------------
