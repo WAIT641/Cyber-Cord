@@ -16,7 +16,7 @@
         </button>
         <div class="group-divider"></div>
         <div class="group-list">
-            <button class="server-button-add" @onclick="() => AddServer()"></button>
+            <button class="server-button-add" @onclick="AddServer"></button>
             @if (_servers.Count > 0)
             {
                 @foreach (var server in _servers)
@@ -142,7 +142,13 @@
     <div class="content-area">
         <div class="content-header">
             <h2>@ContentTitle</h2>
-            <button>Call</button>
+            @if ((_selectedChannelIndex is not null && _currentDmView == DmViewState.Channels) 
+             ||  (_selectedChatIndex is not null && _currentDmView == DmViewState.Chats))
+            {
+                <button @onclick="MakeCallAsync" class="telephone-button">
+                    <img src="res/telephone.svg" alt="telephone icon"/>
+                </button>   
+            }
         </div>
 
         <div class="content-body">

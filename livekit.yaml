@@ -5,9 +5,9 @@ rtc:
   port_range_start: 50000
   port_range_end: 50020
   use_external_ip: false
-  node_ip: 192.168.0.169
+  node_ip: 127.0.0.1
   turn_servers:
-    - host: 192.168.0.169
+    - host: 127.0.0.1
       port: 3478
       protocol: udp
       username: cybercord
@@ -15,7 +15,7 @@ rtc:
 
 turn:
   enabled: true
-  domain: 192.168.0.169
+  domain: 127.0.0.1
   udp_port: 3478
 
 keys:

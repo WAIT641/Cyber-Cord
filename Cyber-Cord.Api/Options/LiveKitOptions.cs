@@ -1,4 +1,4 @@
-public class LiveKitSettings
+public class LiveKitOptions
 {
     public const string Section = "LiveKit";
 

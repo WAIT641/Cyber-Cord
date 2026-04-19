@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   viewBox="0 0 12.7 12.7"
+   version="1.1"
+   xmlns="http://www.w3.org/2000/svg">
+  <path
+      style="fill:#fff;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:50;paint-order:stroke markers fill;stroke-opacity:1;fill-opacity:1"
+      d="M 2.0804932 1.0759033 A 6.8352875 3.5010108 45.000047 0 0 1.3327352 4.5320231 A 6.8352875 3.5010108 45.000047 0 0 8.1679769 11.367265 A 6.8352875 3.5010108 45.000047 0 0 11.624097 10.619507 A 6.8352875 3.5010108 45.000047 0 1 11.558468 10.647412 A 3.2435872 2.4056903 38.323754 0 0 11.587406 10.623641 L 9.2252767 8.4144735 L 7.9219971 9.6330037 A 6.8352875 3.5010108 45.000047 0 1 3.030306 4.817277 L 4.2855265 3.4752401 L 2.076359 1.1125936 A 3.2435815 2.4056669 51.679528 0 0 2.0525879 1.1415324 A 6.8352875 3.5010108 45.000047 0 1 2.0804932 1.0759033 z " />
+  <path
+      style="fill-opacity:0;stroke:#fff;stroke-width:0.33901;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:50;stroke-dasharray:none;paint-order:stroke markers fill;stroke-opacity:1"
+      d="m 5.4611719,4.1739927 a 2.2436299,2.2437773 0 0 1 2.7083009,0.356578 2.2436299,2.2437773 0 0 1 0.3565545,2.7084787"/>
+  <path
+      style="fill-opacity:0;stroke:#fff;stroke-width:0.581134;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:50;stroke-dasharray:none;paint-order:stroke markers fill;stroke-opacity:1"
+      d="M 5.5822338,1.8636932 A 3.8462384,3.8461306 0 0 1 10.225054,2.474915 3.8462384,3.8461306 0 0 1 10.836293,7.1176053"/>
+</svg>

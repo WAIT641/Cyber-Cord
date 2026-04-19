@@ -10,6 +10,7 @@ public interface IChatsService
     Task<ChatReturnModel> GetChatByIdAsync(int chatId);
     Task<List<UserReturnModel>> GetChatUsersAsync(int chatId);
     Task<CursorPaginatedResult<MessageReturnModel>> GetChatMessagesAsync(int chatId, CursorPaginationFilter filter);
+    Task<VoiceTokenDto> GetChatVoiceTokenAsync(int chatId);
     Task<ChatReturnModel> CreateChatAsync(ChatCreateModel model);
     Task AddUserToChatAsync(int chatId, UserChatCreateModel model, bool allowFriendChats = false);
     Task<MessageReturnModel> PostMessageToChatAsync(int chatId, MessageCreateModel model);

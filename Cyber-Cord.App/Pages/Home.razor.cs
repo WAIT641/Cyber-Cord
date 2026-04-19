@@ -1530,6 +1530,16 @@ public partial class Home : ComponentBase, IDisposable
         StateHasChanged();
     }
 
+    private async Task MakeCallAsync()
+    {
+        if (_currentDmView == DmViewState.Chats && _selectedChatIndex is not null)
+        {
+            var token = await ApiService.GetChatVoiceTokenAsync(_chats[_selectedChatIndex!.Value].Id);
+
+            await JsRuntime.InvokeVoidAsync("alert", $"token: {token.Token}\n{token.RoomId}\n{token.ServerUrl}");
+        }
+    }
+    
     public void Dispose()
     {
         Dispose(true);
@@ -1545,5 +1555,4 @@ public partial class Home : ComponentBase, IDisposable
     {
         Dispose(false);
     }
-
 }
