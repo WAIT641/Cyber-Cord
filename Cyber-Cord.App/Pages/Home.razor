@@ -278,7 +278,11 @@
             }
         </div>
     </div>
-</div>
+        @if (CallWindowService.Visible)
+        {
+            <Cyber_Cord.App.Components.CallWindow Name="TODO"/>
+        }
+    </div>
 
 @if (_currentUser is not null)
 {

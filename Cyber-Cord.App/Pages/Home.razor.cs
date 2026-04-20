@@ -39,6 +39,9 @@ public partial class Home : ComponentBase, IDisposable
 
     [Inject]
     private UserSettingsService UserSettingsService { get; set; } = default!;
+
+    [Inject]
+    private CallWindowService CallWindowService { get; set; } = default!;
     
 
     [CascadingParameter]
@@ -1535,8 +1538,9 @@ public partial class Home : ComponentBase, IDisposable
         if (_currentDmView == DmViewState.Chats && _selectedChatIndex is not null)
         {
             var token = await ApiService.GetChatVoiceTokenAsync(_chats[_selectedChatIndex!.Value].Id);
+            CallWindowService.MakeCall(token);
 
-            await JsRuntime.InvokeVoidAsync("alert", $"token: {token.Token}\n{token.RoomId}\n{token.ServerUrl}");
+            await JsRuntime.InvokeVoidAsync("alert", $"token: {token!.Token}\n{token.RoomId}\n{token.ServerUrl}");
         }
     }
     

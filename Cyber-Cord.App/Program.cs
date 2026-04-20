@@ -18,6 +18,7 @@ builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(baseAddr
 builder.Services.AddSingleton<WebSocketService>();
 builder.Services.AddSingleton<SessionState>();
 builder.Services.AddSingleton<UserSettingsService>();
+builder.Services.AddSingleton<CallWindowService>();
 
 builder.Services.AddTransient<CookieDelegatingHandler>();
 builder.Services.AddHttpClient(Microsoft.Extensions.Options.Options.DefaultName, client => client.BaseAddress = new Uri(baseAddress))

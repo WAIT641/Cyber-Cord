@@ -1,0 +1,89 @@
+﻿<div class="call-window @(_isMinimized ? "minimized" : "")"
+     id="call-window"
+     style="left: @(_x)px; top: @(_y)px; width: @(_width)px; @(_isMinimized ? "" : $"height: {_height}px;")">
+
+    <!-- Title bar — drag handle -->
+    <div class="call-titlebar" id="call-titlebar">
+        <div class="call-title">
+            <span class="call-icon">🔊</span>
+            <span class="channel-name">@(Name ?? "Call")</span>
+            @if (_isConnected)
+            {
+                <span class="live-badge">LIVE</span>
+            }
+        </div>
+        <div class="call-controls">
+            <button class="ctrl-btn" @onclick="ToggleMinimize" title="@(_isMinimized ? "Expand" : "Minimize")">
+                @(_isMinimized ? "▲" : "▼")
+            </button>
+            <button class="ctrl-btn close" @onclick="CloseWindow" title="Close">✕</button>
+        </div>
+    </div>
+
+    @if (!_isMinimized)
+    {
+        <div class="call-body">
+
+            @if (_errorMessage is not null)
+            {
+                <div class="call-error">⚠ @_errorMessage</div>
+            }
+
+            <!-- Participant grid -->
+            @if (_participants.Count > 0)
+            {
+                <div class="participant-grid">
+                    @foreach (var p in _participants.Values)
+                    {
+                        <div class="participant-tile @(p.IsSpeaking ? "speaking" : "") @(p.IsMuted ? "muted" : "")">
+                            <div class="participant-video" id="participant-@p.Identity"></div>
+                            <div class="participant-info">
+                                <span class="participant-avatar">@p.DisplayName[0]</span>
+                                <span class="participant-name">@p.DisplayName</span>
+                                <span class="participant-status">
+                                    @if (p.IsMuted)
+                                    {
+                                        <text>🔇</text>
+                                    }
+                                    @if (p.IsSpeaking)
+                                    {
+                                        <text>🔊</text>
+                                    }
+                                </span>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else if (_isConnected)
+            {
+                <div class="empty-state">Waiting for others to join...</div>
+            }
+
+            <!-- Action bar -->
+            <div class="call-actions">
+                @if (!_isConnected)
+                {
+                    <button class="action-btn join" @onclick="JoinAsync" disabled="@_isBusy">
+                        @(_isBusy ? "..." : "Join Voice")
+                    </button>
+                }
+                else
+                {
+                    <button class="action-btn @(_isMuted ? "active" : "")" @onclick="ToggleMuteAsync" title="@(_isMuted ? "Unmute" : "Mute")">
+                        @(_isMuted ? "🔇" : "🎙️")
+                    </button>
+                    <button class="action-btn @(_isCameraOn ? "active" : "")" @onclick="ToggleCameraAsync" title="@(_isCameraOn ? "Camera Off" : "Camera On")">
+                        @(_isCameraOn ? "📷" : "📵")
+                    </button>
+                    <button class="action-btn leave" @onclick="LeaveAsync" title="Leave">
+                        📞
+                    </button>
+                }
+            </div>
+        </div>
+
+        <!-- Resize handle -->
+        <div class="resize-handle" id="resize-handle"></div>
+    }
+</div>
