@@ -50,7 +50,7 @@ public partial class Home : ComponentBase, IDisposable
     // State management
     private DmViewState _currentDmView = DmViewState.Friends;
     private bool _directMessages = true;
-    private bool _isAddingFriend = false;
+    private bool _isAddingFriend;
     private int? _selectedServerId;
     private int? selectedChatId;
     private int? _selectedChannelIndex;
@@ -164,7 +164,7 @@ public partial class Home : ComponentBase, IDisposable
             case WebSocketServerModel server:
                 await WebSocketServerReloadAsync(server);
                 break;
-            case WebSocketCallMessageModel call:
+            case WebSocketCallMessageModel _:
                 
                 break;
         }
@@ -352,9 +352,9 @@ public partial class Home : ComponentBase, IDisposable
 
         var result = await ApiService.GetUsersChatsAsync();
 
-        if (result is null || !result.IsOk())
+        if (!result.IsOk())
         {
-            await ErrorProviderService.ShowErrorAsync(UpdateState, $"When loading chats: {result?.Error}");
+            await ErrorProviderService.ShowErrorAsync(UpdateState, $"When loading chats: {result.Error}");
             return;
         }
 
@@ -517,21 +517,22 @@ public partial class Home : ComponentBase, IDisposable
 
             await SelectChannelByIndexAsync(index);
         }
-        else if (_currentDmView == DmViewState.Channels && _channels.Any())
+        else switch (_currentDmView)
         {
-            await SelectChannelByIndexAsync(0);
-        }
-        else if (_currentDmView == DmViewState.Channels)
-        {
-            return;
-        }
-        else
-        {
-            var previousDmViewState = _currentDmView;
+            case DmViewState.Channels when _channels.Count != 0:
+                await SelectChannelByIndexAsync(0);
+                break;
+            case DmViewState.Channels:
+                return;
+            default:
+            {
+                var previousDmViewState = _currentDmView;
 
-            await ShowDirectMessagesAsync();
+                await ShowDirectMessagesAsync();
 
-            _currentDmView = previousDmViewState;
+                _currentDmView = previousDmViewState;
+                break;
+            }
         }
     }
 
@@ -1253,7 +1254,6 @@ public partial class Home : ComponentBase, IDisposable
         if (result is null)
         {
             await ErrorProviderService.ShowErrorAsync(UpdateState, "Could not update user settings");
-            return;
         }
     }
 
@@ -1405,7 +1405,6 @@ public partial class Home : ComponentBase, IDisposable
         if (!result.IsOk())
         {
             await ErrorProviderService.ShowErrorAsync(UpdateState, $"Error {result.Error}");
-            return;
         }
     }
     
@@ -1416,7 +1415,6 @@ public partial class Home : ComponentBase, IDisposable
         if (!result.IsOk())
         {
             await ErrorProviderService.ShowErrorAsync(UpdateState, $"Error {result.Error}");
-            return;
         }
     }
 
@@ -1538,9 +1536,14 @@ public partial class Home : ComponentBase, IDisposable
         if (_currentDmView == DmViewState.Chats && _selectedChatIndex is not null)
         {
             var token = await ApiService.GetChatVoiceTokenAsync(_chats[_selectedChatIndex!.Value].Id);
-            CallWindowService.MakeCall(token);
 
-            await JsRuntime.InvokeVoidAsync("alert", $"token: {token!.Token}\n{token.RoomId}\n{token.ServerUrl}");
+            if (token is null)
+            {
+                await ErrorProviderService.ShowErrorAsync(UpdateState, "Could not get a token for this call");
+                return;
+            }
+            
+            CallWindowService.MakeCall(token, UpdateState);
         }
     }
     
@@ -1550,7 +1553,7 @@ public partial class Home : ComponentBase, IDisposable
         GC.SuppressFinalize(this);
     }
 
-    protected virtual void Dispose(bool disposing)
+    protected virtual void Dispose(bool _)
     {
         WebSocketService.ReceivedMessageAsync -= WebSocketService_ReceivedMessageAsync;
     }

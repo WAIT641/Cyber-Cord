@@ -1,40 +1,39 @@
-using Cyber_Cord.App.Pages;
 using Cyber_Cord.App.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 
 namespace Cyber_Cord.App.Components;
 
-public partial class CallWindow : IAsyncDisposable
+public partial class CallWindow : IDisposable
 {
     [Parameter, EditorRequired]
     public string? Name { get; set; }
     [Inject]
-    private IJSRuntime JS { get; set; } = default!;
+    private IJSRuntime Js { get; set; } = default!;
     [Inject]
     private CallWindowService CallWindowService { get; set; } = default!;
 
-    private bool _isMinimized = false;
+    private bool _isMinimized;
     private double _x = 80;
     private double _y = 80;
     private double _width = 320;
     private double _height = 420;
 
-    private bool _isConnected = false;
-    private bool _isMuted = false;
-    private bool _isCameraOn = false;
-    private bool _isBusy = false;
+    private bool _isConnected;
+    private bool _isMuted;
+    private bool _isCameraOn;
+    private bool _isBusy;
     private string? _errorMessage;
-    private DotNetObjectReference<FloatingCallWindow>? _dotnetRef;
+    private DotNetObjectReference<CallWindow>? _dotnetRef;
 
     private record ParticipantState(string Identity, string DisplayName, bool IsMuted, bool IsSpeaking);
-    private Dictionary<string, ParticipantState> _participants = new();
+    private readonly Dictionary<string, ParticipantState> _participants = new();
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            await JS!.InvokeVoidAsync("floatingWindow.init", "call-window", "call-titlebar", "resize-handle", DotNetObjectReference.Create(this));
+            await Js.InvokeVoidAsync("floatingWindow.init", "call-window", "call-titlebar", "resize-handle", DotNetObjectReference.Create(this));
         }
     }
 
@@ -46,7 +45,7 @@ public partial class CallWindow : IAsyncDisposable
         if (!_isMinimized)
         {
             await Task.Delay(50); // TODO Task.Yield
-            await JS.InvokeVoidAsync("floatingWindow.initResize", "call-window", "resize-handle", DotNetObjectReference.Create(this));
+            await Js.InvokeVoidAsync("floatingWindow.initResize", "call-window", "resize-handle", DotNetObjectReference.Create(this));
         }
     }
 
@@ -81,22 +80,23 @@ public partial class CallWindow : IAsyncDisposable
 
         try
         {
-            // TODO REDO
-
-            /*if (!response.IsSuccessStatusCode) { _errorMessage = "Failed to get voice token."; return; }
-
-            var tokenDto = await response.Content.ReadFromJsonAsync<VoiceTokenDto>();
-            if (tokenDto is null) { _errorMessage = "Invalid token response."; return; }
-
             _dotnetRef = DotNetObjectReference.Create(this);
-            var result = await JS.InvokeAsync<ConnectResult>(
-                "livekitInterop.connect", tokenDto.ServerUrl, tokenDto.Token, _dotnetRef);
 
-            if (!result.Success) { _errorMessage = $"Connection failed: {result.Error}"; return; }
+            var result = await CallWindowService.ConnectAsync(_dotnetRef);
+
+            if (!result.Success)
+            {
+                _errorMessage = $"Connection failed: {result.Error}";
+                return;
+            }
 
             if (result.Participants is not null)
+            {
                 foreach (var p in result.Participants)
-                    _participants[p.Identity] = new ParticipantState(p.Identity, p.Name, false, false);*/
+                {
+                    _participants[p.Identity] = new ParticipantState(p.Identity, p.Name, false, false);
+                }
+            }
 
             _isConnected = true;
         }
@@ -106,7 +106,7 @@ public partial class CallWindow : IAsyncDisposable
 
     private async Task LeaveAsync()
     {
-        await JS.InvokeVoidAsync("livekitInterop.disconnect");
+        await Js.InvokeVoidAsync("livekitInterop.disconnect");
         _isConnected = false;
         _isMuted = false;
         _isCameraOn = false;
@@ -117,14 +117,14 @@ public partial class CallWindow : IAsyncDisposable
     private async Task ToggleMuteAsync()
     {
         _isMuted = !_isMuted;
-        await JS.InvokeVoidAsync("livekitInterop.setMuted", _isMuted);
+        await Js.InvokeVoidAsync("livekitInterop.setMuted", _isMuted);
         StateHasChanged();
     }
 
     private async Task ToggleCameraAsync()
     {
         _isCameraOn = !_isCameraOn;
-        await JS.InvokeVoidAsync("livekitInterop.setCameraEnabled", _isCameraOn);
+        await Js.InvokeVoidAsync("livekitInterop.setCameraEnabled", _isCameraOn);
         StateHasChanged();
     }
 
@@ -167,10 +167,8 @@ public partial class CallWindow : IAsyncDisposable
         InvokeAsync(StateHasChanged);
     }
 
-    public async ValueTask DisposeAsync()
+    public void Dispose()
     {
-        if (_isConnected)
-            await JS.InvokeVoidAsync("livekitInterop.disconnect");
         _dotnetRef?.Dispose();
     }
 }

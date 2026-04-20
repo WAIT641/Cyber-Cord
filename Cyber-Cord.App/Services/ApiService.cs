@@ -13,6 +13,7 @@ using System.Net.Mime;
 using Microsoft.AspNetCore.JsonPatch;
 using Shared.Models;
 using Shared.Models.ApiModels;
+using Shared.Models.Voice;
 
 namespace Cyber_Cord.App.Services;
 
