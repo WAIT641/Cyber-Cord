@@ -17,9 +17,6 @@ public class PasswordHasher(IOptions<PasswordOptions> optionsAccessor) : ICustom
 
     public string CreatePassword(string password)
     {
-        // TODO: remove
-        return password;
-        
         var salt = new byte[_saltLength];
 
         RandomNumberGenerator.Fill(salt);
@@ -50,9 +47,6 @@ public class PasswordHasher(IOptions<PasswordOptions> optionsAccessor) : ICustom
 
     public bool CheckPassword(string password, string savedPasswordHash)
     {
-        //TODO: remove
-        return password == savedPasswordHash;
-        
         var hashBytes = Convert.FromBase64String(savedPasswordHash);
         
         if (hashBytes.Length != _hashLength + _saltLength)
