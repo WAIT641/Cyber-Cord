@@ -188,7 +188,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidAudience = builder.Configuration[ConfigurationConstants.TokenAudiencePath],
             ValidateLifetime = true,
             ClockSkew = TimeSpan.Zero,
-            RoleClaimType = ClaimTypes.Role
+            RoleClaimType = ClaimTypes.Role,
+
         };
         options.Events = new JwtBearerEvents
         {

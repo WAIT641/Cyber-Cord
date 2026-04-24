@@ -116,8 +116,8 @@ window.floatingWindow = (() => {
         if (!win || !resizeHandle) return;
 
         // Clone the handle to strip old listeners
-        const newHandle = resizeHandle.cloneNode(true);
-        resizeHandle.parentNode.replaceChild(newHandle, resizeHandle);
+        //const newHandle = resizeHandle.cloneNode(true);
+        ///*resizeHandle.parentNode*/win.replaceChild(newHandle, resizeHandle);
 
         let isResizing  = false;
         let resizeStartX = 0;
@@ -125,7 +125,7 @@ window.floatingWindow = (() => {
         let resizeStartW = 0;
         let resizeStartH = 0;
 
-        newHandle.addEventListener('mousedown', (e) => {
+        resizeHandle.addEventListener('mousedown', (e) => {
             isResizing   = true;
             resizeStartX = e.clientX;
             resizeStartY = e.clientY;

@@ -44,7 +44,7 @@ public partial class CallWindow : IDisposable
 
         if (!_isMinimized)
         {
-            await Task.Delay(50); // TODO Task.Yield
+            await Task.Yield();
             await Js.InvokeVoidAsync("floatingWindow.initResize", "call-window", "resize-handle", DotNetObjectReference.Create(this));
         }
     }

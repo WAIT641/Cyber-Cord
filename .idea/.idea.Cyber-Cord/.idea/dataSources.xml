@@ -9,5 +9,12 @@
       <jdbc-url>Server=(localdb)\mssqllocaldb;Database=CyberCordDb;Trusted_Connection=True;MultipleActiveResultSets=true</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
+    <data-source source="LOCAL" name="CyberCordDb@localhost" uuid="31fd8a7f-686a-4121-9059-caf0a98d1028">
+      <driver-ref>sqlserver.jb</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>com.jetbrains.jdbc.sqlserver.SqlServerDriver</jdbc-driver>
+      <jdbc-url>Server=localhost,1433;Database=CyberCordDb</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
   </component>
 </project>
